@@ -6,10 +6,14 @@ export default {
   version,
 
   migrate(versionedData) {
+    console.log(' ');
+
     const safeVersionedData = cloneDeep(versionedData);
     safeVersionedData.meta.version = version;
     try {
       if (safeVersionedData.data.config.provider.type !== 'rpc') {
+        console.log(' ');
+
         return Promise.resolve(safeVersionedData);
       }
       switch (safeVersionedData.data.config.provider.rpcTarget) {
@@ -26,6 +30,8 @@ export default {
         // No default
       }
     } catch (_) {
+      console.log(' ');
+
       // empty
     }
     return Promise.resolve(safeVersionedData);

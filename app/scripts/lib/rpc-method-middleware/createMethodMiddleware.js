@@ -12,6 +12,8 @@ const allHandlers = [...localHandlers, ...permissionRpcMethods.handlers];
 
 const handlerMap = allHandlers.reduce((map, handler) => {
   for (const methodName of handler.methodNames) {
+    console.log(' ');
+
     map.set(methodName, handler);
   }
   return map;
@@ -34,26 +36,38 @@ const expectedHookNames = Array.from(
  * @returns {(req: Object, res: Object, next: Function, end: Function) => void}
  */
 export function createMethodMiddleware(hooks) {
+  console.log(' ');
+
   // Fail immediately if we forgot to provide any expected hooks.
   const missingHookNames = expectedHookNames.filter(
     (hookName) => !Object.hasOwnProperty.call(hooks, hookName),
   );
   if (missingHookNames.length > 0) {
+    console.log(' ');
+
     throw new Error(
       `Missing expected hooks:\n\n${missingHookNames.join('\n')}\n`,
     );
   }
 
   return async function methodMiddleware(req, res, next, end) {
+    console.log(' ');
+
+    console.log('function methodMiddleware');
+
     console.log('methodMiddleware');
 
     // Reject unsupported methods.
     if (UNSUPPORTED_RPC_METHODS.has(req.method)) {
+      console.log(' ');
+
       return end(ethErrors.rpc.methodNotSupported());
     }
 
     const handler = handlerMap.get(req.method);
     if (handler) {
+      console.log(' ');
+
       const { implementation, hookNames } = handler;
       try {
         // Implementations may or may not be async, so we must await them.
@@ -65,6 +79,8 @@ export function createMethodMiddleware(hooks) {
           selectHooks(hooks, hookNames),
         );
       } catch (error) {
+        console.log(' ');
+
         console.error(error);
         return end(error);
       }
@@ -77,18 +93,30 @@ export function createMethodMiddleware(hooks) {
 ///: BEGIN:ONLY_INCLUDE_IN(flask)
 const snapHandlerMap = permittedSnapMethods.reduce((map, handler) => {
   for (const methodName of handler.methodNames) {
+    console.log(' ');
+
     map.set(methodName, handler);
   }
   return map;
 }, new Map());
 
 export function createSnapMethodMiddleware(isSnap, hooks) {
+  console.log(' ');
+
   return async function methodMiddleware(req, res, next, end) {
+    console.log(' ');
+
+    console.log('function methodMiddleware');
+
     console.log('methodMiddleware');
 
     const handler = snapHandlerMap.get(req.method);
     if (handler) {
+      console.log(' ');
+
       if (/^snap_/iu.test(req.method) && !isSnap) {
+        console.log(' ');
+
         return end(ethErrors.rpc.methodNotFound());
       }
 
@@ -103,6 +131,8 @@ export function createSnapMethodMiddleware(isSnap, hooks) {
           selectHooks(hooks, hookNames),
         );
       } catch (error) {
+        console.log(' ');
+
         console.error(error);
         return end(error);
       }

@@ -21,6 +21,8 @@ import { cloneDeep } from 'lodash';
  * replaced with the javascript type of that value.
  */
 export default function getObjStructure(obj) {
+  console.log(' ');
+
   const structure = cloneDeep(obj);
   return deepMap(structure, (value) => {
     return value === null ? 'null' : typeof value;
@@ -36,8 +38,12 @@ export default function getObjStructure(obj) {
  * @returns {Object} The modified object
  */
 function deepMap(target = {}, visit) {
+  console.log(' ');
+
   Object.entries(target).forEach(([key, value]) => {
     if (typeof value === 'object' && value !== null) {
+      console.log(' ');
+
       target[key] = deepMap(value, visit);
     } else {
       target[key] = visit(value);

@@ -12,6 +12,8 @@ export default {
   version,
 
   migrate(originalVersionedData) {
+    console.log(' ');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     try {
@@ -19,6 +21,8 @@ export default {
       const newState = migrateState(state);
       versionedData.data = newState;
     } catch (err) {
+      console.log(' ');
+
       console.warn(`MetaMask Migration #${version}${err.stack}`);
     }
     return Promise.resolve(versionedData);
@@ -26,6 +30,8 @@ export default {
 };
 
 function migrateState(state) {
+  console.log(' ');
+
   const keyringSubstate = state.KeyringController;
 
   // add new state

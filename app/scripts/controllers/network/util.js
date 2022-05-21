@@ -4,6 +4,8 @@ import { TRANSACTION_ENVELOPE_TYPES } from '../../../../shared/constants/transac
 export const getNetworkDisplayName = (key) => NETWORK_TO_NAME_MAP[key];
 
 export function formatTxMetaForRpcResult(txMeta) {
+  console.log(' ');
+
   const { r, s, v, hash, txReceipt, txParams } = txMeta;
   const {
     to,
@@ -36,6 +38,8 @@ export function formatTxMetaForRpcResult(txMeta) {
   };
 
   if (maxFeePerGas && maxPriorityFeePerGas) {
+    console.log(' ');
+
     formattedTxMeta.gasPrice = maxFeePerGas;
     formattedTxMeta.maxFeePerGas = maxFeePerGas;
     formattedTxMeta.maxPriorityFeePerGas = maxPriorityFeePerGas;

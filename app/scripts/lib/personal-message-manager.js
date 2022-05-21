@@ -35,6 +35,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * @param options.metricsEvent
    */
   constructor({ metricsEvent }) {
+    console.log(' ');
+
     super();
     this.memStore = new ObservableStore({
       unapprovedPersonalMsgs: {},
@@ -78,8 +80,12 @@ export default class PersonalMessageManager extends EventEmitter {
    * @returns {promise} When the message has been signed or rejected
    */
   addUnapprovedMessageAsync(msgParams, req) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       if (!msgParams.from) {
+        console.log(' ');
+
         reject(
           new Error('MetaMask Message Signature: from field is required.'),
         );
@@ -124,6 +130,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * @returns {number} The id of the newly created PersonalMessage.
    */
   addUnapprovedMessage(msgParams, req) {
+    console.log(' ');
+
     log.debug(
       `PersonalMessageManager addUnapprovedMessage: ${JSON.stringify(
         msgParams,
@@ -131,6 +139,8 @@ export default class PersonalMessageManager extends EventEmitter {
     );
     // add origin from request
     if (req) {
+      console.log(' ');
+
       msgParams.origin = req.origin;
     }
     msgParams.data = this.normalizeMsgData(msgParams.data);
@@ -158,6 +168,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * @param {Message} msg - The PersonalMessage to add to this.messages
    */
   addMsg(msg) {
+    console.log(' ');
+
     this.messages.push(msg);
     this._saveMsgList();
   }
@@ -170,6 +182,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * if no PersonalMessage has that id.
    */
   getMsg(msgId) {
+    console.log(' ');
+
     return this.messages.find((msg) => msg.id === msgId);
   }
 
@@ -182,6 +196,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams object with metamaskId removed.
    */
   approveMessage(msgParams) {
+    console.log(' ');
+
     this.setMsgStatusApproved(msgParams.metamaskId);
     return this.prepMsgForSigning(msgParams);
   }
@@ -192,6 +208,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * @param {number} msgId - The id of the PersonalMessage to approve.
    */
   setMsgStatusApproved(msgId) {
+    console.log(' ');
+
     this._setMsgStatus(msgId, 'approved');
   }
 
@@ -203,6 +221,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * @param {buffer} rawSig - The raw data of the signature request
    */
   setMsgStatusSigned(msgId, rawSig) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.rawSig = rawSig;
     this._updateMsg(msg);
@@ -216,6 +236,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams with the metamaskId property removed
    */
   prepMsgForSigning(msgParams) {
+    console.log(' ');
+
     delete msgParams.metamaskId;
     return Promise.resolve(msgParams);
   }
@@ -227,7 +249,11 @@ export default class PersonalMessageManager extends EventEmitter {
    * @param reason
    */
   rejectMsg(msgId, reason = undefined) {
+    console.log(' ');
+
     if (reason) {
+      console.log(' ');
+
       const msg = this.getMsg(msgId);
       this.metricsEvent({
         event: reason,
@@ -248,6 +274,8 @@ export default class PersonalMessageManager extends EventEmitter {
    * @param error
    */
   errorMessage(msgId, error) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.error = error;
     this._updateMsg(msg);
@@ -275,8 +303,12 @@ export default class PersonalMessageManager extends EventEmitter {
    * with the PersonalMessage
    */
   _setMsgStatus(msgId, status) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     if (!msg) {
+      console.log(' ');
+
       throw new Error(
         `PersonalMessageManager - Message not found for id: "${msgId}".`,
       );
@@ -285,6 +317,8 @@ export default class PersonalMessageManager extends EventEmitter {
     this._updateMsg(msg);
     this.emit(`${msgId}:${status}`, msg);
     if (status === 'rejected' || status === 'signed') {
+      console.log(' ');
+
       this.emit(`${msgId}:finished`, msg);
     }
   }
@@ -298,8 +332,12 @@ export default class PersonalMessageManager extends EventEmitter {
    * id) in this.messages
    */
   _updateMsg(msg) {
+    console.log(' ');
+
     const index = this.messages.findIndex((message) => message.id === msg.id);
     if (index !== -1) {
+      console.log(' ');
+
       this.messages[index] = msg;
     }
     this._saveMsgList();
@@ -329,12 +367,18 @@ export default class PersonalMessageManager extends EventEmitter {
    * @returns {string} A hex string conversion of the buffer data
    */
   normalizeMsgData(data) {
+    console.log(' ');
+
     try {
       const stripped = stripHexPrefix(data);
       if (stripped.match(hexRe)) {
+        console.log(' ');
+
         return addHexPrefix(stripped);
       }
     } catch (e) {
+      console.log(' ');
+
       log.debug(`Message was not hex encoded, interpreting as utf8.`);
     }
 

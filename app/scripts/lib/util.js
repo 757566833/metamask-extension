@@ -26,10 +26,16 @@ import {
 const getEnvironmentTypeMemo = memoize((url) => {
   const parsedUrl = new URL(url);
   if (parsedUrl.pathname === '/popup.html') {
+    console.log(' ');
+
     return ENVIRONMENT_TYPE_POPUP;
   } else if (['/home.html', '/phishing.html'].includes(parsedUrl.pathname)) {
+    console.log(' ');
+
     return ENVIRONMENT_TYPE_FULLSCREEN;
   } else if (parsedUrl.pathname === '/notification.html') {
+    console.log(' ');
+
     return ENVIRONMENT_TYPE_NOTIFICATION;
   }
   return ENVIRONMENT_TYPE_BACKGROUND;
@@ -61,12 +67,20 @@ const getPlatform = () => {
   const { userAgent } = navigator;
 
   if (userAgent.includes('Firefox')) {
+    console.log(' ');
+
     return PLATFORM_FIREFOX;
   } else if ('brave' in navigator) {
+    console.log(' ');
+
     return PLATFORM_BRAVE;
   } else if (userAgent.includes('Edg/')) {
+    console.log(' ');
+
     return PLATFORM_EDGE;
   } else if (userAgent.includes('OPR')) {
+    console.log(' ');
+
     return PLATFORM_OPERA;
   }
   return PLATFORM_CHROME;
@@ -79,6 +93,8 @@ const getPlatform = () => {
  * @returns {Object} A BN object
  */
 function hexToBn(inputHex) {
+  console.log(' ');
+
   return new BN(stripHexPrefix(inputHex), 16);
 }
 
@@ -91,6 +107,8 @@ function hexToBn(inputHex) {
  * @returns {BN} The product of the multiplication
  */
 function BnMultiplyByFraction(targetBN, numerator, denominator) {
+  console.log(' ');
+
   const numBN = new BN(numerator);
   const denomBN = new BN(denominator);
   return targetBN.mul(numBN).div(denomBN);
@@ -105,10 +123,14 @@ function BnMultiplyByFraction(targetBN, numerator, denominator) {
 function checkForError() {
   const { lastError } = browser.runtime;
   if (!lastError) {
+    console.log(' ');
+
     return undefined;
   }
   // if it quacks like an Error, its an Error
   if (lastError.stack && lastError.message) {
+    console.log(' ');
+
     return lastError;
   }
   // repair incomplete error object (eg chromium v77)
@@ -123,14 +145,20 @@ function checkForError() {
  */
 const addHexPrefix = (str) => {
   if (typeof str !== 'string' || str.match(/^-?0x/u)) {
+    console.log(' ');
+
     return str;
   }
 
   if (str.match(/^-?0X/u)) {
+    console.log(' ');
+
     return str.replace('0X', '0x');
   }
 
   if (str.startsWith('-')) {
+    console.log(' ');
+
     return str.replace('-', '-0x');
   }
 
@@ -144,13 +172,21 @@ const addHexPrefix = (str) => {
  * @returns {string} A '0x' prefixed hex string
  */
 function bnToHex(inputBn) {
+  console.log(' ');
+
   return addHexPrefix(inputBn.toString(16));
 }
 
 function getChainType(chainId) {
+  console.log(' ');
+
   if (chainId === MAINNET_CHAIN_ID) {
+    console.log(' ');
+
     return 'mainnet';
   } else if (TEST_CHAINS.includes(chainId)) {
+    console.log(' ');
+
     return 'testnet';
   }
   return 'custom';

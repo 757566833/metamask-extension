@@ -4,6 +4,8 @@ import createRandomId from '../../../shared/modules/random-id';
 
 class MetaRPCClient {
   constructor(connectionStream) {
+    console.log(' ');
+
     this.connectionStream = connectionStream;
     this.notificationChannel = new SafeEventEmitter();
     this.uncaughtErrorChannel = new SafeEventEmitter();
@@ -13,12 +15,16 @@ class MetaRPCClient {
   }
 
   onNotification(handler) {
+    console.log(' ');
+
     this.notificationChannel.addListener('notification', (data) => {
       handler(data);
     });
   }
 
   onUncaughtError(handler) {
+    console.log(' ');
+
     this.uncaughtErrorChannel.addListener('error', (error) => {
       handler(error);
     });
@@ -30,7 +36,12 @@ class MetaRPCClient {
   }
 
   handleResponse(data) {
+    console.log('handleResponse');
+    console.log(data);
+    // 这里接受所有流的回调
+
     const { id, result, error, method, params } = data;
+    // id和error都没有就是通知
     const isNotification = id === undefined && error === undefined;
     const cb = this.requests.get(id);
 
@@ -72,7 +83,12 @@ const metaRPCClientFactory = (connectionStream) => {
   const metaRPCClient = new MetaRPCClient(connectionStream);
   return new Proxy(metaRPCClient, {
     get: (object, property) => {
+      console.log('metaRPCClientFactory.get');
+      console.log(object);
+      console.log(property);
       if (object[property]) {
+        console.log(' ');
+
         return object[property];
       }
       return (...p) => {

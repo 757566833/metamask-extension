@@ -9,6 +9,10 @@ const version = 68;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -19,6 +23,8 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const {
     PermissionsController = {},
     PermissionsMetadata = {},
@@ -45,6 +51,8 @@ function transformState(state) {
 }
 
 function getPermissionControllerState(PermissionsController) {
+  console.log(' ');
+
   const { domains = {} } = PermissionsController;
 
   /**
@@ -117,6 +125,8 @@ function getPermissionControllerState(PermissionsController) {
 }
 
 function getSubjectMetadataControllerState(domainMetadata) {
+  console.log(' ');
+
   /**
    * Example existing domainMetadata entry.
    *
@@ -142,6 +152,8 @@ function getSubjectMetadataControllerState(domainMetadata) {
       delete other.host;
 
       if (origin) {
+        console.log(' ');
+
         transformed[origin] = {
           name,
           iconUrl: icon,

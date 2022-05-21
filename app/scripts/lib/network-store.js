@@ -27,12 +27,18 @@ export default class ReadOnlyNetworkStore {
    * Initializes by loading state from the network
    */
   async _init() {
+    console.log('_init');
+
     try {
       const response = await fetchWithTimeout(FIXTURE_SERVER_URL);
       if (response.ok) {
+        console.log(' ');
+
         this._state = await response.json();
       }
     } catch (error) {
+      console.log(' ');
+
       log.debug(`Error loading network state: '${error.message}'`);
     } finally {
       this._initialized = true;
@@ -45,7 +51,11 @@ export default class ReadOnlyNetworkStore {
    * @returns {Promise<object>}
    */
   async get() {
+    console.log('get');
+
     if (!this._initialized) {
+      console.log(' ');
+
       await this._initializing;
     }
     return this._state;
@@ -58,7 +68,13 @@ export default class ReadOnlyNetworkStore {
    * @returns {Promise<void>}
    */
   async set(state) {
+    console.log(' ');
+
+    console.log('set');
+
     if (!this._initialized) {
+      console.log(' ');
+
       await this._initializing;
     }
     this._state = state;

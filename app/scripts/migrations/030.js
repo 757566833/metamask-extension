@@ -13,6 +13,10 @@ export default {
   version,
 
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -23,13 +27,21 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const newState = state;
   if (state.PreferencesController) {
+    console.log(' ');
+
     const { frequentRpcListDetail } = newState.PreferencesController;
     if (frequentRpcListDetail) {
+      console.log(' ');
+
       frequentRpcListDetail.forEach((rpc, index) => {
         // eslint-disable-next-line radix
         if (Boolean(rpc.chainId) && Number.isNaN(parseInt(rpc.chainId))) {
+          console.log(' ');
+
           delete frequentRpcListDetail[index].chainId;
         }
       });
@@ -37,6 +49,8 @@ function transformState(state) {
     }
   }
   if (state.NetworkController) {
+    console.log(' ');
+
     if (
       newState.NetworkController.network &&
       // eslint-disable-next-line radix

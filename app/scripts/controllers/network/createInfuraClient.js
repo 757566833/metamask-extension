@@ -14,6 +14,8 @@ import { PollingBlockTracker } from 'eth-block-tracker';
 import { NETWORK_TYPE_TO_ID_MAP } from '../../../../shared/constants/network';
 
 export default function createInfuraClient({ network, projectId }) {
+  console.log(' ');
+
   const infuraMiddleware = createInfuraMiddleware({
     network,
     projectId,
@@ -36,7 +38,11 @@ export default function createInfuraClient({ network, projectId }) {
 }
 
 function createNetworkAndChainIdMiddleware({ network }) {
+  console.log(' ');
+
   if (!NETWORK_TYPE_TO_ID_MAP[network]) {
+    console.log(' ');
+
     throw new Error(`createInfuraClient - unknown network "${network}"`);
   }
 

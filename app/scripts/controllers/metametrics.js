@@ -78,6 +78,8 @@ export default class MetaMetricsController {
       // This is a temporary measure. Currently there are errors flooding sentry due to a problem in how we are tracking anonymousId
       // We intend on removing this as soon as we understand how to correctly solve that problem.
       if (!exceptionsToFilter[err.message]) {
+        console.log(' ');
+
         captureException(err);
       }
     };
@@ -155,7 +157,11 @@ export default class MetaMetricsController {
    * @returns {MetaMetricsEventFragment}
    */
   createEventFragment(options) {
+    console.log(' ');
+
     if (!options.successEvent || !options.category) {
+      console.log(' ');
+
       throw new Error(
         `Must specify success event and category. Success event was: ${
           options.event
@@ -184,6 +190,8 @@ export default class MetaMetricsController {
     });
 
     if (options.initialEvent) {
+      console.log(' ');
+
       this.trackEvent({
         event: fragment.initialEvent,
         category: fragment.category,
@@ -209,6 +217,8 @@ export default class MetaMetricsController {
    * @returns {[MetaMetricsEventFragment]}
    */
   getEventFragmentById(id) {
+    console.log(' ');
+
     const { fragments } = this.store.getState();
 
     const fragment = fragments[id];
@@ -224,11 +234,15 @@ export default class MetaMetricsController {
    *  properties to initiate the fragment with.
    */
   updateEventFragment(id, payload) {
+    console.log(' ');
+
     const { fragments } = this.store.getState();
 
     const fragment = fragments[id];
 
     if (!fragment) {
+      console.log(' ');
+
       throw new Error(`Event fragment with id ${id} does not exist.`);
     }
 
@@ -258,8 +272,12 @@ export default class MetaMetricsController {
    *  property will take precedence.
    */
   finalizeEventFragment(id, { abandoned = false, page, referrer } = {}) {
+    console.log(' ');
+
     const fragment = this.store.getState().fragments[id];
     if (!fragment) {
+      console.log(' ');
+
       throw new Error(`Funnel with id ${id} does not exist.`);
     }
 
@@ -289,12 +307,18 @@ export default class MetaMetricsController {
    * @param {Object} userTraits
    */
   identify(userTraits) {
+    console.log(' ');
+
     const { metaMetricsId, participateInMetaMetrics } = this.state;
 
     if (!participateInMetaMetrics || !metaMetricsId || !userTraits) {
+      console.log(' ');
+
       return;
     }
     if (typeof userTraits !== 'object') {
+      console.log(' ');
+
       console.warn(
         `MetaMetricsController#identify: userTraits parameter must be an object. Received type: ${typeof userTraits}`,
       );
@@ -315,10 +339,16 @@ export default class MetaMetricsController {
    *  if not set
    */
   setParticipateInMetaMetrics(participateInMetaMetrics) {
+    console.log(' ');
+
     let { metaMetricsId } = this.state;
     if (participateInMetaMetrics && !metaMetricsId) {
+      console.log(' ');
+
       metaMetricsId = this.generateMetaMetricsId();
     } else if (participateInMetaMetrics === false) {
+      console.log(' ');
+
       metaMetricsId = null;
     }
     this.store.updateState({ participateInMetaMetrics, metaMetricsId });
@@ -337,8 +367,12 @@ export default class MetaMetricsController {
    *  view
    */
   trackPage({ name, params, environmentType, page, referrer }, options) {
+    console.log(' ');
+
     try {
       if (this.state.participateInMetaMetrics === false) {
+        console.log(' ');
+
         return;
       }
 
@@ -364,6 +398,8 @@ export default class MetaMetricsController {
         context: this._buildContext(referrer, page),
       });
     } catch (err) {
+      console.log(' ');
+
       this._captureException(err);
     }
   }
@@ -375,6 +411,8 @@ export default class MetaMetricsController {
    * @param {MetaMetricsEventOptions} [options] - options for handling/routing the event
    */
   trackEvent(payload, options) {
+    console.log(' ');
+
     // validation is not caught and handled
     this.validatePayload(payload);
     this.submitEvent(payload, options).catch((err) =>
@@ -393,9 +431,15 @@ export default class MetaMetricsController {
    * @returns {Promise<void>}
    */
   async submitEvent(payload, options) {
+    console.log(' ');
+
+    console.log('submitEvent');
+
     this.validatePayload(payload);
 
     if (!this.state.participateInMetaMetrics && !options?.isOptIn) {
+      console.log(' ');
+
       return;
     }
 
@@ -404,10 +448,14 @@ export default class MetaMetricsController {
     const events = [];
 
     if (payload.sensitiveProperties) {
+      console.log(' ');
+
       // sensitiveProperties will only be tracked using the anonymousId property and generic id
       // If the event options already specify to exclude the metaMetricsId we throw an error as
       // a signal to the developer that the event was implemented incorrectly
       if (options?.excludeMetaMetricsId === true) {
+        console.log(' ');
+
         throw new Error(
           'sensitiveProperties was specified in an event payload that also set the excludeMetaMetricsId flag',
         );
@@ -440,8 +488,12 @@ export default class MetaMetricsController {
    * @param {MetaMetricsEventPayload} payload - details of the event
    */
   validatePayload(payload) {
+    console.log(' ');
+
     // event and category are required fields for all payloads
     if (!payload.event || !payload.category) {
+      console.log(' ');
+
       throw new Error(
         `Must specify event and category. Event was: ${
           payload.event
@@ -457,8 +509,12 @@ export default class MetaMetricsController {
   }
 
   handleMetaMaskStateUpdate(newState) {
+    console.log(' ');
+
     const userTraits = this._buildUserTraitsObject(newState);
     if (userTraits) {
+      console.log(' ');
+
       this.identify(userTraits);
     }
   }
@@ -476,6 +532,8 @@ export default class MetaMetricsController {
    * @returns {MetaMetricsContext}
    */
   _buildContext(referrer, page = METAMETRICS_BACKGROUND_PAGE_OBJECT) {
+    console.log(' ');
+
     return {
       app: {
         name: 'MetaMask Extension',
@@ -498,6 +556,8 @@ export default class MetaMetricsController {
    * @returns {SegmentEventPayload} formatted event payload for segment
    */
   _buildEventPayload(rawPayload) {
+    console.log(' ');
+
     const {
       event,
       properties,
@@ -540,6 +600,8 @@ export default class MetaMetricsController {
    * @returns {MetaMetricsTraits | null} traits that have changed since last update
    */
   _buildUserTraitsObject(metamaskState) {
+    console.log(' ');
+
     /**
      * @type {MetaMetricsTraits}
      */
@@ -564,11 +626,15 @@ export default class MetaMetricsController {
     };
 
     if (!this.previousTraits) {
+      console.log(' ');
+
       this.previousTraits = currentTraits;
       return currentTraits;
     }
 
     if (this.previousTraits && !isEqual(this.previousTraits, currentTraits)) {
+      console.log(' ');
+
       const updates = pickBy(
         currentTraits,
         (v, k) => !isEqual(this.previousTraits[k], v),
@@ -588,10 +654,16 @@ export default class MetaMetricsController {
    * @returns {Object}
    */
   _buildValidTraits(userTraits) {
+    console.log(' ');
+
     return Object.entries(userTraits).reduce((validTraits, [key, value]) => {
       if (this._isValidTraitDate(value)) {
+        console.log(' ');
+
         validTraits[key] = value.toISOString();
       } else if (this._isValidTrait(value)) {
+        console.log(' ');
+
         validTraits[key] = value;
       } else {
         console.warn(
@@ -608,8 +680,12 @@ export default class MetaMetricsController {
    * @returns number of unique collectible addresses
    */
   _getNumberOfNFtCollection(metamaskState) {
+    console.log(' ');
+
     const { allCollectibles } = metamaskState;
     if (!allCollectibles) {
+      console.log(' ');
+
       return 0;
     }
 
@@ -626,6 +702,8 @@ export default class MetaMetricsController {
    * @returns number of unique token addresses
    */
   _getNumberOfTokens(metamaskState) {
+    console.log(' ');
+
     return Object.values(metamaskState.allTokens).reduce(
       (result, accountsByChain) => {
         return result + sum(Object.values(accountsByChain).map(size));
@@ -642,9 +720,13 @@ export default class MetaMetricsController {
    * @param {Object} userTraits
    */
   _identify(userTraits) {
+    console.log(' ');
+
     const { metaMetricsId } = this.state;
 
     if (!userTraits || Object.keys(userTraits).length === 0) {
+      console.log(' ');
+
       console.warn('MetaMetricsController#_identify: No userTraits found');
       return;
     }
@@ -655,6 +737,8 @@ export default class MetaMetricsController {
         traits: userTraits,
       });
     } catch (err) {
+      console.log(' ');
+
       this._captureException(err);
     }
   }
@@ -667,6 +751,8 @@ export default class MetaMetricsController {
    * @returns {boolean}
    */
   _isValidTrait(value) {
+    console.log(' ');
+
     const type = typeof value;
 
     return (
@@ -721,6 +807,8 @@ export default class MetaMetricsController {
    * @returns {Promise<void>}
    */
   _track(payload, options) {
+    console.log(' ');
+
     const {
       isOptIn,
       metaMetricsId: metaMetricsIdOverride,
@@ -735,6 +823,8 @@ export default class MetaMetricsController {
     // a config setting for this instead of trying to match the event name
     const isSendFlow = Boolean(payload.event.match(/^send|^confirm/iu));
     if (isSendFlow) {
+      console.log(' ');
+
       excludeMetaMetricsId = true;
     }
     // If we are tracking sensitive data we will always use the anonymousId
@@ -748,9 +838,13 @@ export default class MetaMetricsController {
     // case we will track the opt in event to the user's id. In all other cases
     // we use the metaMetricsId from state.
     if (excludeMetaMetricsId || (isOptIn && !metaMetricsIdOverride)) {
+      console.log(' ');
+
       idType = 'anonymousId';
       idValue = METAMETRICS_ANONYMOUS_ID;
     } else if (isOptIn && metaMetricsIdOverride) {
+      console.log(' ');
+
       idValue = metaMetricsIdOverride;
     }
     payload[idType] = idValue;
@@ -758,6 +852,8 @@ export default class MetaMetricsController {
     // If this is an event on the old matomo schema, add a key to the payload
     // to designate it as such
     if (matomoEvent === true) {
+      console.log(' ');
+
       payload.properties.legacy_event = true;
     }
 
@@ -768,6 +864,8 @@ export default class MetaMetricsController {
     return new Promise((resolve, reject) => {
       const callback = (err) => {
         if (err) {
+          console.log(' ');
+
           // The error that segment gives us has some manipulation done to it
           // that seemingly breaks with lockdown enabled. Creating a new error
           // here prevents the system from freezing when the network request to
@@ -781,6 +879,8 @@ export default class MetaMetricsController {
 
       this.segment.track(payload, callback);
       if (flushImmediately) {
+        console.log(' ');
+
         this.segment.flush();
       }
     });

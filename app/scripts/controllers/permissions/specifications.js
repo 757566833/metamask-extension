@@ -96,6 +96,8 @@ export const getPermissionSpecifications = ({
 
       factory: (permissionOptions, requestData) => {
         if (Array.isArray(permissionOptions.caveats)) {
+          console.log(' ');
+
           throw new Error(
             `${PermissionKeys.eth_accounts} error: Received unexpected caveats. Any permitted caveats will be added automatically.`,
           );
@@ -103,6 +105,8 @@ export const getPermissionSpecifications = ({
 
         // This value will be further validated as part of the caveat.
         if (!requestData.approvedAccounts) {
+          console.log(' ');
+
           throw new Error(
             `${PermissionKeys.eth_accounts} error: No approved accounts specified.`,
           );
@@ -124,9 +128,13 @@ export const getPermissionSpecifications = ({
 
         return accounts.sort((firstAddress, secondAddress) => {
           if (!identities[firstAddress]) {
+            console.log(' ');
+
             captureKeyringTypesWithMissingIdentities(identities, accounts);
             throw new Error(`Missing identity for address: "${firstAddress}".`);
           } else if (!identities[secondAddress]) {
+            console.log(' ');
+
             captureKeyringTypesWithMissingIdentities(identities, accounts);
             throw new Error(
               `Missing identity for address: "${secondAddress}".`,
@@ -137,8 +145,12 @@ export const getPermissionSpecifications = ({
           ) {
             return 0;
           } else if (identities[firstAddress].lastSelected === undefined) {
+            console.log(' ');
+
             return 1;
           } else if (identities[secondAddress].lastSelected === undefined) {
+            console.log(' ');
+
             return -1;
           }
 
@@ -175,7 +187,11 @@ export const getPermissionSpecifications = ({
  * PreferencesController identities.
  */
 function validateCaveatAccounts(accounts, getIdentities) {
+  console.log(' ');
+
   if (!Array.isArray(accounts) || accounts.length === 0) {
+    console.log(' ');
+
     throw new Error(
       `${PermissionKeys.eth_accounts} error: Expected non-empty array of Ethereum addresses.`,
     );
@@ -184,12 +200,16 @@ function validateCaveatAccounts(accounts, getIdentities) {
   const identities = getIdentities();
   accounts.forEach((address) => {
     if (!address || typeof address !== 'string') {
+      console.log(' ');
+
       throw new Error(
         `${PermissionKeys.eth_accounts} error: Expected an array of Ethereum addresses. Received: "${address}".`,
       );
     }
 
     if (!identities[address]) {
+      console.log(' ');
+
       throw new Error(
         `${PermissionKeys.eth_accounts} error: Received unrecognized address: "${address}".`,
       );

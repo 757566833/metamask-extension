@@ -60,6 +60,8 @@ async function requestEthereumAccountsHandler(
   },
 ) {
   if (locks.has(origin)) {
+    console.log(' ');
+
     res.error = ethErrors.rpc.resourceUnavailable(
       `Already processing ${MESSAGE_TYPE.ETH_REQUEST_ACCOUNTS}. Please wait.`,
     );
@@ -67,6 +69,8 @@ async function requestEthereumAccountsHandler(
   }
 
   if (hasPermission(MESSAGE_TYPE.ETH_ACCOUNTS)) {
+    console.log(' ');
+
     // We wait for the extension to unlock in this case only, because permission
     // requests are handled when the extension is unlocked, regardless of the
     // lock state when they were received.
@@ -76,6 +80,8 @@ async function requestEthereumAccountsHandler(
       res.result = await getAccounts();
       end();
     } catch (error) {
+      console.log(' ');
+
       end(error);
     } finally {
       locks.delete(origin);
@@ -87,6 +93,8 @@ async function requestEthereumAccountsHandler(
   try {
     await requestAccountsPermission();
   } catch (err) {
+    console.log(' ');
+
     res.error = err;
     return end();
   }
@@ -95,6 +103,8 @@ async function requestEthereumAccountsHandler(
   const accounts = await getAccounts();
   /* istanbul ignore else: too hard to induce, see below comment */
   if (accounts.length > 0) {
+    console.log(' ');
+
     res.result = accounts;
   } else {
     // This should never happen, because it should be caught in the

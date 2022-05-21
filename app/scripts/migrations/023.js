@@ -13,6 +13,8 @@ export default {
   version,
 
   migrate(originalVersionedData) {
+    console.log(' ');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     try {
@@ -20,6 +22,8 @@ export default {
       const newState = transformState(state);
       versionedData.data = newState;
     } catch (err) {
+      console.log(' ');
+
       console.warn(`MetaMask Migration #${version}${err.stack}`);
     }
     return Promise.resolve(versionedData);
@@ -27,19 +31,27 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const newState = state;
 
   const { TransactionController } = newState;
   if (TransactionController && TransactionController.transactions) {
+    console.log(' ');
+
     const { transactions } = newState.TransactionController;
 
     if (transactions.length <= 40) {
+      console.log(' ');
+
       return newState;
     }
 
     const reverseTxList = transactions.reverse();
     let stripping = true;
     while (reverseTxList.length > 40 && stripping) {
+      console.log(' ');
+
       const txIndex = reverseTxList.findIndex((txMeta) => {
         return (
           txMeta.status === TRANSACTION_STATUSES.FAILED ||
@@ -49,6 +61,8 @@ function transformState(state) {
         );
       });
       if (txIndex < 0) {
+        console.log(' ');
+
         stripping = false;
       } else {
         reverseTxList.splice(txIndex, 1);

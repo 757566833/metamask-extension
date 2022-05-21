@@ -17,6 +17,8 @@ export class PermissionLogController {
    * @param {{ restrictedMethods: Set<string>, initState: Record<string, unknown> }} options - Options bag.
    */
   constructor({ restrictedMethods, initState }) {
+    console.log(' ');
+
     this.restrictedMethods = restrictedMethods;
     this.store = new ObservableStore({
       permissionHistory: {},
@@ -40,6 +42,8 @@ export class PermissionLogController {
    * @param {Array<Object>} logs - The new activity log array.
    */
   updateActivityLog(logs) {
+    console.log(' ');
+
     this.store.updateState({ permissionActivityLog: logs });
   }
 
@@ -58,6 +62,8 @@ export class PermissionLogController {
    * @param {Object} history - The new permissions history log object.
    */
   updateHistory(history) {
+    console.log(' ');
+
     this.store.updateState({ permissionHistory: history });
   }
 
@@ -71,7 +77,11 @@ export class PermissionLogController {
    * @param {Array<string>} accounts - The accounts.
    */
   updateAccountsHistory(origin, accounts) {
+    console.log(' ');
+
     if (accounts.length === 0) {
+      console.log(' ');
+
       return;
     }
 
@@ -108,11 +118,15 @@ export class PermissionLogController {
         activityEntry = this.logRequest(req, isInternal);
 
         if (method === `${WALLET_PREFIX}requestPermissions`) {
+          console.log(' ');
+
           // get the corresponding methods from the requested permissions so
           // that we can record permissions history
           requestedMethods = this.getRequestedMethods(req);
         }
       } else if (method === 'eth_requestAccounts') {
+        console.log(' ');
+
         // eth_requestAccounts is a special case; we need to extract the accounts
         // from it
         activityEntry = this.logRequest(req, isInternal);
@@ -129,6 +143,8 @@ export class PermissionLogController {
         this.logResponse(activityEntry, res, time);
 
         if (requestedMethods && !res.error && res.result) {
+          console.log(' ');
+
           // any permissions or accounts changes will be recorded on the response,
           // so we only log permissions history here
           this.logPermissionsHistory(
@@ -151,6 +167,8 @@ export class PermissionLogController {
    * @param {boolean} isInternal - Whether the request is internal.
    */
   logRequest(request, isInternal) {
+    console.log(' ');
+
     const activityEntry = {
       id: request.id,
       method: request.method,
@@ -177,7 +195,11 @@ export class PermissionLogController {
    * @param {number} time - Output from Date.now()
    */
   logResponse(entry, response, time) {
+    console.log(' ');
+
     if (!entry || !response) {
+      console.log(' ');
+
       return;
     }
 
@@ -193,6 +215,8 @@ export class PermissionLogController {
    * @param {Object} entry - The activity log entry.
    */
   commitNewActivity(entry) {
+    console.log(' ');
+
     const logs = this.getActivityLog();
 
     // add new entry to end of log
@@ -200,6 +224,8 @@ export class PermissionLogController {
 
     // remove oldest log if exceeding size limit
     if (logs.length > LOG_LIMIT) {
+      console.log(' ');
+
       logs.shift();
     }
 
@@ -225,6 +251,8 @@ export class PermissionLogController {
     let accounts, newEntries;
 
     if (isEthRequestAccounts) {
+      console.log(' ');
+
       accounts = result;
       const accountToTimeMap = getAccountToTimeMap(accounts, time);
 
@@ -241,6 +269,8 @@ export class PermissionLogController {
       newEntries = result
         .map((perm) => {
           if (perm.parentCapability === 'eth_accounts') {
+            console.log(' ');
+
             accounts = this.getAccountsFromPermission(perm);
           }
 
@@ -250,7 +280,11 @@ export class PermissionLogController {
           // all approved permissions will be included in the response,
           // not just the newly requested ones
           if (requestedMethods.includes(method)) {
+            console.log(' ');
+
             if (method === 'eth_accounts') {
+              console.log(' ');
+
               const accountToTimeMap = getAccountToTimeMap(accounts, time);
 
               acc[method] = {
@@ -267,6 +301,8 @@ export class PermissionLogController {
     }
 
     if (Object.keys(newEntries).length > 0) {
+      console.log(' ');
+
       this.commitNewHistory(origin, newEntries);
     }
   }
@@ -280,6 +316,8 @@ export class PermissionLogController {
    * @param {Object} newEntries - The new entries to commit.
    */
   commitNewHistory(origin, newEntries) {
+    console.log(' ');
+
     // a simple merge updates most permissions
     const history = this.getHistory();
     const newOriginHistory = {
@@ -294,6 +332,8 @@ export class PermissionLogController {
     const newEthAccountsEntry = newEntries.eth_accounts;
 
     if (existingEthAccountsEntry && newEthAccountsEntry) {
+      console.log(' ');
+
       // we may intend to update just the accounts, not the permission
       // itself
       const lastApproved =
@@ -322,6 +362,8 @@ export class PermissionLogController {
    * @returns {Array<string>} The names of the requested permissions.
    */
   getRequestedMethods(request) {
+    console.log(' ');
+
     if (
       !request.params ||
       !request.params[0] ||
@@ -341,17 +383,25 @@ export class PermissionLogController {
    * @returns {Array<string>} The permitted accounts.
    */
   getAccountsFromPermission(perm) {
+    console.log(' ');
+
     if (perm.parentCapability !== 'eth_accounts' || !perm.caveats) {
+      console.log(' ');
+
       return [];
     }
 
     const accounts = new Set();
     for (const caveat of perm.caveats) {
+      console.log(' ');
+
       if (
         caveat.type === CaveatTypes.restrictReturnedAccounts &&
         Array.isArray(caveat.value)
       ) {
         for (const value of caveat.value) {
+          console.log(' ');
+
           accounts.add(value);
         }
       }
@@ -370,5 +420,7 @@ export class PermissionLogController {
  * @returns {Object} A string:number map of addresses to time.
  */
 function getAccountToTimeMap(accounts, time) {
+  console.log(' ');
+
   return accounts.reduce((acc, account) => ({ ...acc, [account]: time }), {});
 }

@@ -5,6 +5,8 @@ import allLocales from '../../_locales/index.json';
 const existingLocaleCodes = {};
 allLocales.forEach((locale) => {
   if (locale && locale.code) {
+    console.log(' ');
+
     existingLocaleCodes[locale.code.toLowerCase().replace('_', '-')] =
       locale.code;
   }
@@ -17,6 +19,8 @@ allLocales.forEach((locale) => {
  * @returns {Promise<string>} Promises a locale code, either one from the user's preferred list that we have a translation for, or 'en'
  */
 export default async function getFirstPreferredLangCode() {
+  console.log('function getFirstPreferredLangCode');
+
   console.log('getFirstPreferredLangCode');
 
   let userPreferredLocaleCodes;
@@ -24,6 +28,8 @@ export default async function getFirstPreferredLangCode() {
   try {
     userPreferredLocaleCodes = await browser.i18n.getAcceptLanguages();
   } catch (e) {
+    console.log(' ');
+
     // Brave currently throws when calling getAcceptLanguages, so this handles that.
     userPreferredLocaleCodes = [];
   }
@@ -31,6 +37,8 @@ export default async function getFirstPreferredLangCode() {
   // safeguard for Brave Browser until they implement chrome.i18n.getAcceptLanguages
   // https://github.com/MetaMask/metamask-extension/issues/4270
   if (!userPreferredLocaleCodes) {
+    console.log(' ');
+
     userPreferredLocaleCodes = [];
   }
 

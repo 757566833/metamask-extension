@@ -12,12 +12,16 @@ const version = 26;
 export default {
   version,
   migrate(originalVersionedData) {
+    console.log(' ');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     try {
       const state = versionedData.data;
       versionedData.data = transformState(state);
     } catch (err) {
+      console.log(' ');
+
       console.warn(`MetaMask Migration #${version}${err.stack}`);
       return Promise.reject(err);
     }
@@ -26,11 +30,17 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   if (!state.KeyringController || !state.PreferencesController) {
+    console.log(' ');
+
     return state;
   }
 
   if (!state.KeyringController.walletNicknames) {
+    console.log(' ');
+
     return state;
   }
 

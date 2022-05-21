@@ -6,6 +6,10 @@ import registryAbi from './contracts/registry';
 import resolverAbi from './contracts/resolver';
 
 export default async function resolveEnsToIpfsContentId({ provider, name }) {
+  console.log(' ');
+
+  console.log('function resolveEnsToIpfsContentId');
+
   console.log('resolveEnsToIpfsContentId');
 
   const eth = new Eth(provider);
@@ -15,6 +19,8 @@ export default async function resolveEnsToIpfsContentId({ provider, name }) {
   const chainId = Number.parseInt(await eth.net_version(), 10);
   const registryAddress = getRegistryForChainId(chainId);
   if (!registryAddress) {
+    console.log(' ');
+
     throw new Error(
       `EnsIpfsResolver - no known ens-ipfs registry for chainId "${chainId}"`,
     );
@@ -24,6 +30,8 @@ export default async function resolveEnsToIpfsContentId({ provider, name }) {
   const resolverLookupResult = await Registry.resolver(hash);
   const resolverAddress = resolverLookupResult[0];
   if (hexValueIsEmpty(resolverAddress)) {
+    console.log(' ');
+
     throw new Error(`EnsIpfsResolver - no resolver found for name "${name}"`);
   }
   const Resolver = contract(resolverAbi).at(resolverAddress);
@@ -31,12 +39,16 @@ export default async function resolveEnsToIpfsContentId({ provider, name }) {
   const isEIP1577Compliant = await Resolver.supportsInterface('0xbc1c58d1');
   const isLegacyResolver = await Resolver.supportsInterface('0xd8389dc5');
   if (isEIP1577Compliant[0]) {
+    console.log(' ');
+
     const contentLookupResult = await Resolver.contenthash(hash);
     const rawContentHash = contentLookupResult[0];
     let decodedContentHash = contentHash.decode(rawContentHash);
     const type = contentHash.getCodec(rawContentHash);
 
     if (type === 'ipfs-ns' || type === 'ipns-ns') {
+      console.log(' ');
+
       decodedContentHash = contentHash.helpers.cidV0ToV1Base32(
         decodedContentHash,
       );
@@ -45,10 +57,14 @@ export default async function resolveEnsToIpfsContentId({ provider, name }) {
     return { type, hash: decodedContentHash };
   }
   if (isLegacyResolver[0]) {
+    console.log(' ');
+
     // lookup content id
     const contentLookupResult = await Resolver.content(hash);
     const content = contentLookupResult[0];
     if (hexValueIsEmpty(content)) {
+      console.log(' ');
+
       throw new Error(
         `EnsIpfsResolver - no content ID found for name "${name}"`,
       );
@@ -61,6 +77,8 @@ export default async function resolveEnsToIpfsContentId({ provider, name }) {
 }
 
 function hexValueIsEmpty(value) {
+  console.log(' ');
+
   return [
     undefined,
     null,
@@ -77,6 +95,8 @@ function hexValueIsEmpty(value) {
  * @returns {string|null} the registry address if known, null otherwise
  */
 function getRegistryForChainId(chainId) {
+  console.log(' ');
+
   switch (chainId) {
     case 1:
     case 3:

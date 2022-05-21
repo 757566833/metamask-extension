@@ -16,6 +16,8 @@ export default {
   version,
 
   migrate(originalVersionedData) {
+    console.log(' ');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     try {
@@ -23,6 +25,8 @@ export default {
       const newState = transformState(state);
       versionedData.data = newState;
     } catch (err) {
+      console.log(' ');
+
       console.warn(`MetaMask Migration #${version}${err.stack}`);
     }
     return Promise.resolve(versionedData);
@@ -30,13 +34,19 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const newState = state;
   const { TransactionController } = newState;
   if (TransactionController && TransactionController.transactions) {
+    console.log(' ');
+
     const { transactions } = newState.TransactionController;
     newState.TransactionController.transactions = transactions.map((txMeta) => {
       // no history: initialize
       if (!txMeta.history || txMeta.history.length === 0) {
+        console.log(' ');
+
         const snapshot = snapshotFromTxMeta(txMeta);
         txMeta.history = [snapshot];
         return txMeta;

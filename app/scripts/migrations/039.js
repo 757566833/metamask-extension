@@ -8,6 +8,8 @@ const DAI_V1_TOKEN_SYMBOL = 'DAI';
 const SAI_TOKEN_SYMBOL = 'SAI';
 
 function isOldDai(token = {}) {
+  console.log(' ');
+
   return (
     token &&
     typeof token === 'object' &&
@@ -26,6 +28,10 @@ function isOldDai(token = {}) {
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -35,13 +41,23 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const { PreferencesController } = state;
 
   if (PreferencesController) {
+    console.log(' ');
+
     const tokens = PreferencesController.tokens || [];
     if (Array.isArray(tokens)) {
+      console.log(' ');
+
       for (const token of tokens) {
+        console.log(' ');
+
         if (isOldDai(token)) {
+          console.log(' ');
+
           token.symbol = SAI_TOKEN_SYMBOL;
         }
       }
@@ -49,14 +65,28 @@ function transformState(state) {
 
     const accountTokens = PreferencesController.accountTokens || {};
     if (accountTokens && typeof accountTokens === 'object') {
+      console.log(' ');
+
       for (const address of Object.keys(accountTokens)) {
+        console.log(' ');
+
         const networkTokens = accountTokens[address];
         if (networkTokens && typeof networkTokens === 'object') {
+          console.log(' ');
+
           for (const network of Object.keys(networkTokens)) {
+            console.log(' ');
+
             const tokensOnNetwork = networkTokens[network];
             if (Array.isArray(tokensOnNetwork)) {
+              console.log(' ');
+
               for (const token of tokensOnNetwork) {
+                console.log(' ');
+
                 if (isOldDai(token)) {
+                  console.log(' ');
+
                   token.symbol = SAI_TOKEN_SYMBOL;
                 }
               }

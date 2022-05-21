@@ -17,6 +17,8 @@ const getTestMiddlewares = () => {
 };
 
 export default function createJsonRpcClient({ rpcUrl, chainId }) {
+  console.log(' ');
+
   const fetchMiddleware = createFetchMiddleware({ rpcUrl });
   const blockProvider = providerFromMiddleware(fetchMiddleware);
   const blockTracker = new PollingBlockTracker({
@@ -38,8 +40,12 @@ export default function createJsonRpcClient({ rpcUrl, chainId }) {
 }
 
 function createChainIdMiddleware(chainId) {
+  console.log(' ');
+
   return (req, res, next, end) => {
     if (req.method === 'eth_chainId') {
+      console.log(' ');
+
       res.result = chainId;
       return end();
     }
@@ -54,6 +60,8 @@ function createChainIdMiddleware(chainId) {
 function createEstimateGasDelayTestMiddleware() {
   return createAsyncMiddleware(async (req, _, next) => {
     if (req.method === 'eth_estimateGas') {
+      console.log(' ');
+
       await new Promise((resolve) => setTimeout(resolve, SECOND * 2));
     }
     return next();

@@ -40,9 +40,13 @@ export default function createRPCMethodTrackingMiddleware({
     next((callback) => {
       const endTime = Date.now();
       if (!getMetricsState().participateInMetaMetrics) {
+        console.log(' ');
+
         return callback();
       }
       if (USER_PROMPTED_EVENT_NAME_MAP[req.method]) {
+        console.log(' ');
+
         const userRejected = res.error?.code === 4001;
         trackEvent({
           event: USER_PROMPTED_EVENT_NAME_MAP[req.method],
@@ -60,6 +64,8 @@ export default function createRPCMethodTrackingMiddleware({
           },
         });
       } else if (typeof samplingTimeouts[req.method] === 'undefined') {
+        console.log(' ');
+
         trackEvent({
           event: 'Provider Method Called',
           category: 'inpage_provider',

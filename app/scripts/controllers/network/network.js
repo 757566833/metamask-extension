@@ -34,6 +34,8 @@ const fetchWithTimeout = getFetchWithTimeout(SECOND * 30);
 
 let defaultProviderConfigOpts;
 if (process.env.IN_TEST) {
+  console.log(' ');
+
   defaultProviderConfigOpts = {
     type: NETWORK_TYPE_RPC,
     rpcUrl: 'http://localhost:8545',
@@ -41,6 +43,8 @@ if (process.env.IN_TEST) {
     nickname: 'Localhost 8545',
   };
 } else if (process.env.METAMASK_DEBUG || env === 'test') {
+  console.log(' ');
+
   defaultProviderConfigOpts = { type: RINKEBY, chainId: RINKEBY_CHAIN_ID };
 } else {
   defaultProviderConfigOpts = { type: MAINNET, chainId: MAINNET_CHAIN_ID };
@@ -68,6 +72,8 @@ export const NETWORK_EVENTS = {
 
 export default class NetworkController extends EventEmitter {
   constructor(opts = {}) {
+    console.log(' ');
+
     super();
 
     // create stores
@@ -113,7 +119,11 @@ export default class NetworkController extends EventEmitter {
    * @throws {Error} If the project ID is not a valid string.
    */
   setInfuraProjectId(projectId) {
+    console.log(' ');
+
     if (!projectId || typeof projectId !== 'string') {
+      console.log(' ');
+
       throw new Error('Invalid Infura project ID');
     }
 
@@ -121,6 +131,8 @@ export default class NetworkController extends EventEmitter {
   }
 
   initializeProvider(providerParams) {
+    console.log(' ');
+
     this._baseProviderParams = providerParams;
     const { type, rpcUrl, chainId } = this.getProviderConfig();
     this._configureProvider({ type, rpcUrl, chainId });
@@ -147,6 +159,8 @@ export default class NetworkController extends EventEmitter {
         { method: 'eth_getBlockByNumber', params: ['latest', false] },
         (err, block) => {
           if (err) {
+            console.log(' ');
+
             return reject(err);
           }
           return resolve(block);
@@ -162,8 +176,12 @@ export default class NetworkController extends EventEmitter {
    * @returns {Promise<boolean>} true if current network supports EIP 1559
    */
   async getEIP1559Compatibility() {
+    console.log('getEIP1559Compatibility');
+
     const { EIPS } = this.networkDetails.getState();
     if (EIPS[1559] !== undefined) {
+      console.log(' ');
+
       return EIPS[1559];
     }
     const latestBlock = await this.getLatestBlock();
@@ -176,6 +194,8 @@ export default class NetworkController extends EventEmitter {
   verifyNetwork() {
     // Check network when restoring connectivity:
     if (this.isNetworkLoading()) {
+      console.log(' ');
+
       this.lookupNetwork();
     }
   }
@@ -185,6 +205,8 @@ export default class NetworkController extends EventEmitter {
   }
 
   setNetworkState(network) {
+    console.log(' ');
+
     this.networkStore.putState(network);
   }
 
@@ -195,6 +217,8 @@ export default class NetworkController extends EventEmitter {
    * @param {boolean} isSupported - True if the EIP is supported
    */
   setNetworkEIPSupport(EIPNumber, isSupported) {
+    console.log(' ');
+
     this.networkDetails.updateState({
       EIPS: {
         [EIPNumber]: isSupported,
@@ -216,6 +240,8 @@ export default class NetworkController extends EventEmitter {
   lookupNetwork() {
     // Prevent firing when provider is not defined.
     if (!this._provider) {
+      console.log(' ');
+
       log.warn(
         'NetworkController - lookupNetwork aborted due to missing provider',
       );
@@ -224,6 +250,8 @@ export default class NetworkController extends EventEmitter {
 
     const chainId = this.getCurrentChainId();
     if (!chainId) {
+      console.log(' ');
+
       log.warn(
         'NetworkController - lookupNetwork aborted due to missing chainId',
       );
@@ -240,6 +268,8 @@ export default class NetworkController extends EventEmitter {
     const isInfura = INFURA_PROVIDER_TYPES.includes(type);
 
     if (isInfura) {
+      console.log(' ');
+
       this._checkInfuraAvailability(type);
     } else {
       this.emit(NETWORK_EVENTS.INFURA_IS_UNBLOCKED);
@@ -248,7 +278,11 @@ export default class NetworkController extends EventEmitter {
     ethQuery.sendAsync({ method: 'net_version' }, (err, networkVersion) => {
       const currentNetwork = this.getNetworkState();
       if (initialNetwork === currentNetwork) {
+        console.log(' ');
+
         if (err) {
+          console.log(' ');
+
           this.setNetworkState('loading');
           // keep network details in sync with network state
           this.clearNetworkDetails();
@@ -268,6 +302,8 @@ export default class NetworkController extends EventEmitter {
   }
 
   setRpcTarget(rpcUrl, chainId, ticker = 'ETH', nickname = '', rpcPrefs) {
+    console.log(' ');
+
     assert.ok(
       isPrefixedFormattedHexString(chainId),
       `Invalid chain ID "${chainId}": invalid hex string.`,
@@ -287,6 +323,10 @@ export default class NetworkController extends EventEmitter {
   }
 
   async setProviderType(type) {
+    console.log(' ');
+
+    console.log('setProviderType');
+
     assert.notStrictEqual(
       type,
       NETWORK_TYPE_RPC,
@@ -316,6 +356,8 @@ export default class NetworkController extends EventEmitter {
    * @param config
    */
   setProviderConfig(config) {
+    console.log(' ');
+
     this.previousProviderStore.updateState(this.getProviderConfig());
     this.providerStore.updateState(config);
     this._switchNetwork(config);
@@ -341,6 +383,10 @@ export default class NetworkController extends EventEmitter {
   //
 
   async _checkInfuraAvailability(network) {
+    console.log(' ');
+
+    console.log('_checkInfuraAvailability');
+
     const rpcUrl = `https://${network}.infura.io/v3/${this._infuraProjectId}`;
 
     let networkChanged = false;
@@ -360,26 +406,38 @@ export default class NetworkController extends EventEmitter {
       });
 
       if (networkChanged) {
+        console.log(' ');
+
         return;
       }
 
       if (response.ok) {
+        console.log(' ');
+
         this.emit(NETWORK_EVENTS.INFURA_IS_UNBLOCKED);
       } else {
         const responseMessage = await response.json();
         if (networkChanged) {
+          console.log(' ');
+
           return;
         }
         if (responseMessage.error === INFURA_BLOCKED_KEY) {
+          console.log(' ');
+
           this.emit(NETWORK_EVENTS.INFURA_IS_BLOCKED);
         }
       }
     } catch (err) {
+      console.log(' ');
+
       log.warn(`MetaMask - Infura availability check failed`, err);
     }
   }
 
   _switchNetwork(opts) {
+    console.log(' ');
+
     // Indicate to subscribers that network is about to change
     this.emit(NETWORK_EVENTS.NETWORK_WILL_CHANGE);
     // Set loading state
@@ -393,12 +451,18 @@ export default class NetworkController extends EventEmitter {
   }
 
   _configureProvider({ type, rpcUrl, chainId }) {
+    console.log(' ');
+
     // infura type-based endpoints
     const isInfura = INFURA_PROVIDER_TYPES.includes(type);
     if (isInfura) {
+      console.log(' ');
+
       this._configureInfuraProvider(type, this._infuraProjectId);
       // url-based rpc endpoints
     } else if (type === NETWORK_TYPE_RPC) {
+      console.log(' ');
+
       this._configureStandardProvider(rpcUrl, chainId);
     } else {
       throw new Error(
@@ -408,6 +472,8 @@ export default class NetworkController extends EventEmitter {
   }
 
   _configureInfuraProvider(type, projectId) {
+    console.log(' ');
+
     log.info('NetworkController - configureInfuraProvider', type);
     const networkClient = createInfuraClient({
       network: type,
@@ -417,12 +483,16 @@ export default class NetworkController extends EventEmitter {
   }
 
   _configureStandardProvider(rpcUrl, chainId) {
+    console.log(' ');
+
     log.info('NetworkController - configureStandardProvider', rpcUrl);
     const networkClient = createJsonRpcClient({ rpcUrl, chainId });
     this._setNetworkClient(networkClient);
   }
 
   _setNetworkClient({ networkMiddleware, blockTracker }) {
+    console.log(' ');
+
     const metamaskMiddleware = createMetamaskMiddleware(
       this._baseProviderParams,
     );
@@ -434,13 +504,19 @@ export default class NetworkController extends EventEmitter {
   }
 
   _setProviderAndBlockTracker({ provider, blockTracker }) {
+    console.log(' ');
+
     // update or initialize proxies
     if (this._providerProxy) {
+      console.log(' ');
+
       this._providerProxy.setTarget(provider);
     } else {
       this._providerProxy = createSwappableProxy(provider);
     }
     if (this._blockTrackerProxy) {
+      console.log(' ');
+
       this._blockTrackerProxy.setTarget(blockTracker);
     } else {
       this._blockTrackerProxy = createEventEmitterProxy(blockTracker, {

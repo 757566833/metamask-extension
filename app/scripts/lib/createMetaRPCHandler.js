@@ -3,9 +3,13 @@ import { ethErrors, serializeError } from 'eth-rpc-errors';
 const createMetaRPCHandler = (api, outStream) => {
   return async (data) => {
     if (outStream._writableState.ended) {
+      console.log(' ');
+
       return;
     }
     if (!api[data.method]) {
+      console.log(' ');
+
       outStream.write({
         jsonrpc: '2.0',
         error: ethErrors.rpc.methodNotFound({
@@ -21,17 +25,25 @@ const createMetaRPCHandler = (api, outStream) => {
     try {
       result = await api[data.method](...data.params);
     } catch (err) {
+      console.log(' ');
+
       error = err;
     }
 
     if (outStream._writableState.ended) {
+      console.log(' ');
+
       if (error) {
+        console.log(' ');
+
         console.error(error);
       }
       return;
     }
 
     if (error) {
+      console.log(' ');
+
       outStream.write({
         jsonrpc: '2.0',
         error: serializeError(error, { shouldIncludeStack: true }),

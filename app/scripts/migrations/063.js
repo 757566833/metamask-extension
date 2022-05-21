@@ -8,6 +8,10 @@ const version = 63;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -18,15 +22,21 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const accountTokens = state?.PreferencesController?.accountTokens;
   const accountHiddenTokens = state?.PreferencesController?.accountHiddenTokens;
 
   const newAllTokens = {};
   if (accountTokens) {
+    console.log(' ');
+
     Object.keys(accountTokens).forEach((accountAddress) => {
       Object.keys(accountTokens[accountAddress]).forEach((chainId) => {
         const tokensArray = accountTokens[accountAddress][chainId];
         if (newAllTokens[chainId] === undefined) {
+          console.log(' ');
+
           newAllTokens[chainId] = { [accountAddress]: tokensArray };
         } else {
           newAllTokens[chainId] = {
@@ -40,10 +50,14 @@ function transformState(state) {
 
   const newAllIgnoredTokens = {};
   if (accountHiddenTokens) {
+    console.log(' ');
+
     Object.keys(accountHiddenTokens).forEach((accountAddress) => {
       Object.keys(accountHiddenTokens[accountAddress]).forEach((chainId) => {
         const ignoredTokensArray = accountHiddenTokens[accountAddress][chainId];
         if (newAllIgnoredTokens[chainId] === undefined) {
+          console.log(' ');
+
           newAllIgnoredTokens[chainId] = {
             [accountAddress]: ignoredTokensArray,
           };
@@ -58,6 +72,8 @@ function transformState(state) {
   }
 
   if (state.TokensController) {
+    console.log(' ');
+
     state.TokensController.allTokens = newAllTokens;
     state.TokensController.allIgnoredTokens = newAllIgnoredTokens;
   } else {

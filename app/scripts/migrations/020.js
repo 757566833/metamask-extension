@@ -14,6 +14,8 @@ export default {
   version,
 
   migrate(originalVersionedData) {
+    console.log(' ');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     try {
@@ -21,6 +23,8 @@ export default {
       const newState = transformState(state);
       versionedData.data = newState;
     } catch (err) {
+      console.log(' ');
+
       console.warn(`MetaMask Migration #${version}${err.stack}`);
     }
     return Promise.resolve(versionedData);
@@ -28,8 +32,12 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const newState = state;
   if ('metamask' in newState && !('firstTimeInfo' in newState.metamask)) {
+    console.log(' ');
+
     newState.metamask.firstTimeInfo = {
       version: '3.12.0',
       date: Date.now(),

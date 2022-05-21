@@ -14,6 +14,10 @@ const version = 67;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -24,10 +28,14 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const PreferencesController = state?.PreferencesController || {};
   const preferences = PreferencesController.preferences || {};
 
   if (preferences.showTestNetworks) {
+    console.log(' ');
+
     return state;
   }
 

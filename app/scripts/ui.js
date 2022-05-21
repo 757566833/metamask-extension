@@ -24,6 +24,8 @@ import metaRPCClientFactory from './lib/metaRPCClientFactory';
 start().catch(log.error);
 
 async function start() {
+  console.log('function start');
+
   console.log('start');
 
   // create platform global
@@ -40,6 +42,9 @@ async function start() {
   initializeUiWithTab(activeTab);
 
   function displayCriticalError(container, err) {
+    console.log(' ');
+
+    console.log(' ');
     container.innerHTML =
       '<div class="critical-error">The MetaMask app failed to load: please open and close MetaMask again to restart.</div>';
     container.style.height = '80px';
@@ -48,9 +53,14 @@ async function start() {
   }
 
   function initializeUiWithTab(tab) {
+    console.log(' ');
+
+    console.log(' ');
     const container = document.getElementById('app-content');
     initializeUi(tab, container, connectionStream, (err, store) => {
       if (err) {
+        console.log(' ');
+
         displayCriticalError(container, err);
         return;
       }
@@ -59,6 +69,8 @@ async function start() {
       const { metamask: { completedOnboarding } = {} } = state;
 
       if (!completedOnboarding && windowType !== ENVIRONMENT_TYPE_FULLSCREEN) {
+        console.log(' ');
+
         global.platform.openExtensionInBrowser();
       }
     });
@@ -66,12 +78,18 @@ async function start() {
 }
 
 async function queryCurrentActiveTab(windowType) {
+  console.log(' ');
+
+  console.log('function queryCurrentActiveTab');
+
   console.log('queryCurrentActiveTab');
 
   return new Promise((resolve) => {
     // At the time of writing we only have the `activeTab` permission which means
     // that this query will only succeed in the popup context (i.e. after a "browserAction")
     if (windowType !== ENVIRONMENT_TYPE_POPUP) {
+      console.log(' ');
+
       resolve({});
       return;
     }
@@ -82,6 +100,8 @@ async function queryCurrentActiveTab(windowType) {
       const { origin, protocol } = url ? new URL(url) : {};
 
       if (!origin || origin === 'null') {
+        console.log(' ');
+
         resolve({});
         return;
       }
@@ -92,8 +112,13 @@ async function queryCurrentActiveTab(windowType) {
 }
 
 function initializeUi(activeTab, container, connectionStream, cb) {
+  console.log(' ');
+
+  console.log(' ');
   connectToAccountManager(connectionStream, (err, backgroundConnection) => {
     if (err) {
+      console.log(' ');
+
       cb(err);
       return;
     }
@@ -116,6 +141,9 @@ function initializeUi(activeTab, container, connectionStream, cb) {
  * @param {Function} cb - Called when controller connection is established
  */
 function connectToAccountManager(connectionStream, cb) {
+  console.log(' ');
+
+  console.log(' ');
   const mx = setupMultiplex(connectionStream);
   setupControllerConnection(mx.createStream('controller'), cb);
   setupWeb3Connection(mx.createStream('provider'));
@@ -127,6 +155,9 @@ function connectToAccountManager(connectionStream, cb) {
  * @param {PortDuplexStream} connectionStream - PortStream instance establishing a background connection
  */
 function setupWeb3Connection(connectionStream) {
+  console.log(' ');
+
+  console.log(' ');
   const providerStream = new StreamProvider();
   providerStream.pipe(connectionStream).pipe(providerStream);
   connectionStream.on('error', console.error.bind(console));
@@ -143,6 +174,9 @@ function setupWeb3Connection(connectionStream) {
  * @param {Function} cb - Called when the remote account manager connection is established
  */
 function setupControllerConnection(connectionStream, cb) {
+  console.log(' ');
+
+  console.log(' ');
   const backgroundRPC = metaRPCClientFactory(connectionStream);
   cb(null, backgroundRPC);
 }

@@ -13,6 +13,10 @@ export default {
   version,
 
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -23,10 +27,16 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const newState = state;
 
   if (newState.TransactionController) {
+    console.log(' ');
+
     if (newState.TransactionController.transactions) {
+      console.log(' ');
+
       const { transactions } = newState.TransactionController;
       newState.TransactionController.transactions = transactions.filter(
         (txMeta) => txMeta.status !== TRANSACTION_STATUSES.REJECTED,

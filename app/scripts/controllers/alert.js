@@ -38,6 +38,8 @@ export default class AlertController {
    * @param {AlertControllerOptions} [opts] - Controller configuration parameters
    */
   constructor(opts = {}) {
+    console.log(' ');
+
     const { initState = {}, preferencesStore } = opts;
     const state = {
       ...defaultState,
@@ -64,6 +66,9 @@ export default class AlertController {
   }
 
   setAlertEnabledness(alertId, enabledness) {
+    console.log(' ');
+
+    console.log(' ');
     let { alertEnabledness } = this.store.getState();
     alertEnabledness = { ...alertEnabledness };
     alertEnabledness[alertId] = enabledness;
@@ -76,6 +81,9 @@ export default class AlertController {
    * @param {string} origin - The origin the alert has been shown for
    */
   setUnconnectedAccountAlertShown(origin) {
+    console.log(' ');
+
+    console.log(' ');
     let { unconnectedAccountAlertShownOrigins } = this.store.getState();
     unconnectedAccountAlertShownOrigins = {
       ...unconnectedAccountAlertShownOrigins,
@@ -92,6 +100,9 @@ export default class AlertController {
    * origin, or undefined.
    */
   getWeb3ShimUsageState(origin) {
+    console.log(' ');
+
+    console.log(' ');
     return this.store.getState().web3ShimUsageOrigins[origin];
   }
 
@@ -101,6 +112,9 @@ export default class AlertController {
    * @param {string} origin - The origin the that used the web3 shim.
    */
   setWeb3ShimUsageRecorded(origin) {
+    console.log(' ');
+
+    console.log(' ');
     this._setWeb3ShimUsageState(origin, WEB3_SHIM_USAGE_ALERT_STATES.RECORDED);
   }
 
@@ -111,6 +125,9 @@ export default class AlertController {
    * dismissed for.
    */
   setWeb3ShimUsageAlertDismissed(origin) {
+    console.log(' ');
+
+    console.log(' ');
     this._setWeb3ShimUsageState(origin, WEB3_SHIM_USAGE_ALERT_STATES.DISMISSED);
   }
 
@@ -120,6 +137,9 @@ export default class AlertController {
    * @param {number} value - The state value to set.
    */
   _setWeb3ShimUsageState(origin, value) {
+    console.log(' ');
+
+    console.log(' ');
     let { web3ShimUsageOrigins } = this.store.getState();
     web3ShimUsageOrigins = {
       ...web3ShimUsageOrigins,

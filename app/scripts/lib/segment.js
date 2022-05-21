@@ -56,9 +56,13 @@ export const createSegmentMock = (flushAt = SEGMENT_FLUSH_AT) => {
      * @param callback
      */
     track(payload, callback = () => undefined) {
+      console.log(' ');
+
       segmentMock.queue.push([payload, callback]);
 
       if (segmentMock.queue.length >= flushAt) {
+        console.log(' ');
+
         segmentMock.flush();
       }
     },

@@ -14,6 +14,10 @@ export default {
   version,
 
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -24,14 +28,22 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const newState = state;
 
   if (newState.TransactionController) {
+    console.log(' ');
+
     if (newState.TransactionController.transactions) {
+      console.log(' ');
+
       const { transactions } = newState.TransactionController;
       newState.TransactionController.transactions = transactions.map(
         (txMeta) => {
           if (txMeta.status !== TRANSACTION_STATUSES.UNAPPROVED) {
+            console.log(' ');
+
             return txMeta;
           }
           txMeta.txParams = normalizeTxParams(txMeta.txParams);
@@ -45,6 +57,8 @@ function transformState(state) {
 }
 
 function normalizeTxParams(txParams) {
+  console.log(' ');
+
   // functions that handle normalizing of that key in txParams
   const whiteList = {
     from: (from) => addHexPrefix(from).toLowerCase(),
@@ -60,6 +74,8 @@ function normalizeTxParams(txParams) {
   const normalizedTxParams = {};
   Object.keys(whiteList).forEach((key) => {
     if (txParams[key]) {
+      console.log(' ');
+
       normalizedTxParams[key] = whiteList[key](txParams[key]);
     }
   });

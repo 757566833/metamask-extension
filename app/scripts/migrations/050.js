@@ -20,6 +20,10 @@ const LEGACY_LOCAL_STORAGE_KEYS = [
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
 

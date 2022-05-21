@@ -43,6 +43,8 @@ function logWeb3ShimUsageHandler(
 ) {
   const { origin } = req;
   if (getWeb3ShimUsageState(origin) === undefined) {
+    console.log(' ');
+
     setWeb3ShimUsageRecorded(origin);
 
     sendMetrics(

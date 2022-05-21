@@ -8,11 +8,15 @@ import { cloneDeep } from 'lodash';
  * @returns {Array}
  */
 export function migrateFromSnapshotsToDiffs(longHistory) {
+  console.log(' ');
+
   return (
     longHistory
       // convert non-initial history entries into diffs
       .map((entry, index) => {
         if (index === 0) {
+          console.log(' ');
+
           return entry;
         }
         return generateHistoryEntry(longHistory[index - 1], entry);
@@ -34,10 +38,16 @@ export function migrateFromSnapshotsToDiffs(longHistory) {
  * @returns {Array}
  */
 export function generateHistoryEntry(previousState, newState, note) {
+  console.log(' ');
+
   const entry = jsonDiffer.compare(previousState, newState);
   // Add a note to the first op, since it breaks if we append it to the entry
   if (entry[0]) {
+    console.log(' ');
+
     if (note) {
+      console.log(' ');
+
       entry[0].note = note;
     }
     entry[0].timestamp = Date.now();
@@ -52,6 +62,8 @@ export function generateHistoryEntry(previousState, newState, note) {
  * @returns {Object}
  */
 export function replayHistory(_shortHistory) {
+  console.log(' ');
+
   const shortHistory = cloneDeep(_shortHistory);
   return shortHistory.reduce(
     (val, entry) => jsonDiffer.applyPatch(val, entry).newDocument,
@@ -65,6 +77,8 @@ export function replayHistory(_shortHistory) {
  * @returns {Object} a deep clone without history
  */
 export function snapshotFromTxMeta(txMeta) {
+  console.log(' ');
+
   const shallow = { ...txMeta };
   delete shallow.history;
   return cloneDeep(shallow);

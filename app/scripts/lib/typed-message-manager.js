@@ -36,6 +36,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @param options.metricsEvent
    */
   constructor({ getCurrentChainId, metricsEvent }) {
+    console.log(' ');
+
     super();
     this._getCurrentChainId = getCurrentChainId;
     this.memStore = new ObservableStore({
@@ -81,6 +83,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @returns {promise} When the message has been signed or rejected
    */
   addUnapprovedMessageAsync(msgParams, req, version) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       const msgId = this.addUnapprovedMessage(msgParams, req, version);
       this.once(`${msgId}:finished`, (data) => {
@@ -121,8 +125,12 @@ export default class TypedMessageManager extends EventEmitter {
    * @returns {number} The id of the newly created TypedMessage.
    */
   addUnapprovedMessage(msgParams, req, version) {
+    console.log(' ');
+
     msgParams.version = version;
     if (req) {
+      console.log(' ');
+
       msgParams.origin = req.origin;
     }
     this.validateParams(msgParams);
@@ -154,6 +162,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @param {Object} params - The params to validate
    */
   validateParams(params) {
+    console.log(' ');
+
     assert.ok(
       params && typeof params === 'object',
       'Params must be an object.',
@@ -193,6 +203,8 @@ export default class TypedMessageManager extends EventEmitter {
           `Primary type of "${data.primaryType}" has no type definition.`,
         );
         if (validation.errors.length !== 0) {
+          console.log(' ');
+
           throw ethErrors.rpc.invalidParams({
             message:
               'Signing data must conform to EIP-712 schema. See https://git.io/fNtcx.',
@@ -201,12 +213,16 @@ export default class TypedMessageManager extends EventEmitter {
         }
         let { chainId } = data.domain;
         if (chainId) {
+          console.log(' ');
+
           const activeChainId = parseInt(this._getCurrentChainId(), 16);
           assert.ok(
             !Number.isNaN(activeChainId),
             `Cannot sign messages for chainId "${chainId}", because MetaMask is switching networks.`,
           );
           if (typeof chainId === 'string') {
+            console.log(' ');
+
             chainId = parseInt(chainId, chainId.startsWith('0x') ? 16 : 10);
           }
           assert.equal(
@@ -229,6 +245,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @param {Message} msg - The TypedMessage to add to this.messages
    */
   addMsg(msg) {
+    console.log(' ');
+
     this.messages.push(msg);
     this._saveMsgList();
   }
@@ -241,6 +259,8 @@ export default class TypedMessageManager extends EventEmitter {
    * if no TypedMessage has that id.
    */
   getMsg(msgId) {
+    console.log(' ');
+
     return this.messages.find((msg) => msg.id === msgId);
   }
 
@@ -253,6 +273,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams object with metamaskId removed.
    */
   approveMessage(msgParams) {
+    console.log(' ');
+
     this.setMsgStatusApproved(msgParams.metamaskId);
     return this.prepMsgForSigning(msgParams);
   }
@@ -263,6 +285,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @param {number} msgId - The id of the TypedMessage to approve.
    */
   setMsgStatusApproved(msgId) {
+    console.log(' ');
+
     this._setMsgStatus(msgId, 'approved');
   }
 
@@ -274,6 +298,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @param {buffer} rawSig - The raw data of the signature request
    */
   setMsgStatusSigned(msgId, rawSig) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.rawSig = rawSig;
     this._updateMsg(msg);
@@ -287,6 +313,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams with the metamaskId property removed
    */
   prepMsgForSigning(msgParams) {
+    console.log(' ');
+
     delete msgParams.metamaskId;
     delete msgParams.version;
     return Promise.resolve(msgParams);
@@ -299,7 +327,11 @@ export default class TypedMessageManager extends EventEmitter {
    * @param reason
    */
   rejectMsg(msgId, reason = undefined) {
+    console.log(' ');
+
     if (reason) {
+      console.log(' ');
+
       const msg = this.getMsg(msgId);
       this.metricsEvent({
         event: reason,
@@ -321,6 +353,8 @@ export default class TypedMessageManager extends EventEmitter {
    * @param error
    */
   errorMessage(msgId, error) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.error = error;
     this._updateMsg(msg);
@@ -352,8 +386,12 @@ export default class TypedMessageManager extends EventEmitter {
    * with the TypedMessage
    */
   _setMsgStatus(msgId, status) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     if (!msg) {
+      console.log(' ');
+
       throw new Error(
         `TypedMessageManager - Message not found for id: "${msgId}".`,
       );
@@ -362,6 +400,8 @@ export default class TypedMessageManager extends EventEmitter {
     this._updateMsg(msg);
     this.emit(`${msgId}:${status}`, msg);
     if (status === 'rejected' || status === 'signed' || status === 'errored') {
+      console.log(' ');
+
       this.emit(`${msgId}:finished`, msg);
     }
   }
@@ -375,8 +415,12 @@ export default class TypedMessageManager extends EventEmitter {
    * id) in this.messages
    */
   _updateMsg(msg) {
+    console.log(' ');
+
     const index = this.messages.findIndex((message) => message.id === msg.id);
     if (index !== -1) {
+      console.log(' ');
+
       this.messages[index] = msg;
     }
     this._saveMsgList();

@@ -22,6 +22,8 @@ try {
    * We write this function in IIFE format to avoid polluting global scope.
    */
   (function protectIntrinsics() {
+    console.log(' ');
+
     const namedIntrinsics = Reflect.ownKeys(new Compartment().globalThis);
 
     // These named intrinsics are not automatically hardened by `lockdown`
@@ -45,11 +47,17 @@ try {
       );
 
       if (descriptor) {
+        console.log(' ');
+
         if (descriptor.configurable) {
+          console.log(' ');
+
           // If the property on globalThis is configurable, make it
           // non-configurable. If it has no accessor properties, also make it
           // non-writable.
           if (hasAccessor(descriptor)) {
+            console.log(' ');
+
             Object.defineProperty(globalThis, propertyName, {
               configurable: false,
             });
@@ -62,6 +70,8 @@ try {
         }
 
         if (shouldHardenManually.has(propertyName)) {
+          console.log(' ');
+
           harden(globalThis[propertyName]);
         }
       }
@@ -78,12 +88,18 @@ try {
      * @returns {boolean} Whether the propertyName descriptor has any accessors.
      */
     function hasAccessor(descriptor) {
+      console.log(' ');
+
       return 'set' in descriptor || 'get' in descriptor;
     }
   })();
 } catch (error) {
+  console.log(' ');
+
   console.error('Protecting intrinsics failed:', error);
   if (globalThis.sentry && globalThis.sentry.captureException) {
+    console.log(' ');
+
     globalThis.sentry.captureException(
       new Error(`Protecting intrinsics failed: ${error.message}`),
     );

@@ -10,6 +10,10 @@ const SUPPORT_NOTIFICATION_DATE = '2020-08-31';
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -20,8 +24,12 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const notifications = state?.NotificationController?.notifications;
   if (isPlainObject(notifications)) {
+    console.log(' ');
+
     if (
       notifications[SUPPORT_NOTIFICATION_KEY]?.date ===
       SUPPORT_NOTIFICATION_DATE

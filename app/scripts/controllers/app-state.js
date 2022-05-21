@@ -8,6 +8,8 @@ export default class AppStateController extends EventEmitter {
    * @param {Object} opts
    */
   constructor(opts = {}) {
+    console.log(' ');
+
     const {
       addUnlockListener,
       isUnlocked,
@@ -49,6 +51,8 @@ export default class AppStateController extends EventEmitter {
     preferencesStore.subscribe(({ preferences }) => {
       const currentState = this.store.getState();
       if (currentState.timeoutMinutes !== preferences.autoLockTimeLimit) {
+        console.log(' ');
+
         this._setInactiveTimeout(preferences.autoLockTimeLimit);
       }
     });
@@ -71,8 +75,13 @@ export default class AppStateController extends EventEmitter {
    * unlocked, or immediately if the extension is already unlocked.
    */
   getUnlockPromise(shouldShowUnlockRequest) {
+    console.log(' ');
+
+    console.log(' ');
     return new Promise((resolve) => {
       if (this.isUnlocked()) {
+        console.log(' ');
+
         resolve();
       } else {
         this.waitForUnlock(resolve, shouldShowUnlockRequest);
@@ -90,9 +99,14 @@ export default class AppStateController extends EventEmitter {
    * popup should be opened.
    */
   waitForUnlock(resolve, shouldShowUnlockRequest) {
+    console.log(' ');
+
+    console.log(' ');
     this.waitingForUnlock.push({ resolve });
     this.emit(METAMASK_CONTROLLER_EVENTS.UPDATE_BADGE);
     if (shouldShowUnlockRequest) {
+      console.log(' ');
+
       this._showUnlockRequest();
     }
   }
@@ -101,8 +115,13 @@ export default class AppStateController extends EventEmitter {
    * Drains the waitingForUnlock queue, resolving all the related Promises.
    */
   handleUnlock() {
+    console.log(' ');
     if (this.waitingForUnlock.length > 0) {
+      console.log(' ');
+
       while (this.waitingForUnlock.length > 0) {
+        console.log(' ');
+
         this.waitingForUnlock.shift().resolve();
       }
       this.emit(METAMASK_CONTROLLER_EVENTS.UPDATE_BADGE);
@@ -115,6 +134,9 @@ export default class AppStateController extends EventEmitter {
    * @param {string} [defaultHomeActiveTabName] - the tab name
    */
   setDefaultHomeActiveTabName(defaultHomeActiveTabName) {
+    console.log(' ');
+
+    console.log(' ');
     this.store.updateState({
       defaultHomeActiveTabName,
     });
@@ -124,6 +146,7 @@ export default class AppStateController extends EventEmitter {
    * Record that the user has seen the connected status info popover
    */
   setConnectedStatusPopoverHasBeenShown() {
+    console.log(' ');
     this.store.updateState({
       connectedStatusPopoverHasBeenShown: true,
     });
@@ -133,6 +156,7 @@ export default class AppStateController extends EventEmitter {
    * Record that the user has been shown the recovery phrase reminder.
    */
   setRecoveryPhraseReminderHasBeenShown() {
+    console.log(' ');
     this.store.updateState({
       recoveryPhraseReminderHasBeenShown: true,
     });
@@ -144,6 +168,9 @@ export default class AppStateController extends EventEmitter {
    * @param {number} lastShown - timestamp when user was last shown the reminder.
    */
   setRecoveryPhraseReminderLastShown(lastShown) {
+    console.log(' ');
+
+    console.log(' ');
     this.store.updateState({
       recoveryPhraseReminderLastShown: lastShown,
     });
@@ -153,6 +180,7 @@ export default class AppStateController extends EventEmitter {
    * Sets the last active time to the current time.
    */
   setLastActiveTime() {
+    console.log(' ');
     this._resetTimer();
   }
 
@@ -163,6 +191,9 @@ export default class AppStateController extends EventEmitter {
    * @param {number} timeoutMinutes - The inactive timeout in minutes.
    */
   _setInactiveTimeout(timeoutMinutes) {
+    console.log(' ');
+
+    console.log(' ');
     this.store.updateState({
       timeoutMinutes,
     });
@@ -179,13 +210,18 @@ export default class AppStateController extends EventEmitter {
    * @private
    */
   _resetTimer() {
+    console.log(' ');
     const { timeoutMinutes } = this.store.getState();
 
     if (this.timer) {
+      console.log(' ');
+
       clearTimeout(this.timer);
     }
 
     if (!timeoutMinutes) {
+      console.log(' ');
+
       return;
     }
 
@@ -202,6 +238,9 @@ export default class AppStateController extends EventEmitter {
    * @param browser
    */
   setBrowserEnvironment(os, browser) {
+    console.log(' ');
+
+    console.log(' ');
     this.store.updateState({ browserEnvironment: { os, browser } });
   }
 
@@ -212,6 +251,9 @@ export default class AppStateController extends EventEmitter {
    * @param pollingTokenType
    */
   addPollingToken(pollingToken, pollingTokenType) {
+    console.log(' ');
+
+    console.log(' ');
     const prevState = this.store.getState()[pollingTokenType];
     this.store.updateState({
       [pollingTokenType]: [...prevState, pollingToken],
@@ -225,6 +267,9 @@ export default class AppStateController extends EventEmitter {
    * @param pollingTokenType
    */
   removePollingToken(pollingToken, pollingTokenType) {
+    console.log(' ');
+
+    console.log(' ');
     const prevState = this.store.getState()[pollingTokenType];
     this.store.updateState({
       [pollingTokenType]: prevState.filter((token) => token !== pollingToken),
@@ -248,6 +293,9 @@ export default class AppStateController extends EventEmitter {
    * @param showTestnetMessageInDropdown
    */
   setShowTestnetMessageInDropdown(showTestnetMessageInDropdown) {
+    console.log(' ');
+
+    console.log(' ');
     this.store.updateState({ showTestnetMessageInDropdown });
   }
 
@@ -257,6 +305,9 @@ export default class AppStateController extends EventEmitter {
    * @param trezorModel - The Trezor model.
    */
   setTrezorModel(trezorModel) {
+    console.log(' ');
+
+    console.log(' ');
     this.store.updateState({ trezorModel });
   }
 
@@ -268,6 +319,7 @@ export default class AppStateController extends EventEmitter {
   setCollectiblesDetectionNoticeDismissed(
     collectiblesDetectionNoticeDismissed,
   ) {
+    console.log(' ');
     this.store.updateState({
       collectiblesDetectionNoticeDismissed,
     });
@@ -279,6 +331,9 @@ export default class AppStateController extends EventEmitter {
    * @param enableEIP1559V2NoticeDismissed
    */
   setEnableEIP1559V2NoticeDismissed(enableEIP1559V2NoticeDismissed) {
+    console.log(' ');
+
+    console.log(' ');
     this.store.updateState({
       enableEIP1559V2NoticeDismissed,
     });
@@ -290,6 +345,9 @@ export default class AppStateController extends EventEmitter {
    * @param collectiblesDropdownState
    */
   updateCollectibleDropDownState(collectiblesDropdownState) {
+    console.log(' ');
+
+    console.log(' ');
     this.store.updateState({
       collectiblesDropdownState,
     });

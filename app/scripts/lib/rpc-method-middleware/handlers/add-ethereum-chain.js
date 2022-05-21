@@ -38,6 +38,8 @@ async function addEthereumChainHandler(
   },
 ) {
   if (!req.params?.[0] || typeof req.params[0] !== 'object') {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Expected single, object parameter. Received:\n${JSON.stringify(
@@ -69,6 +71,8 @@ async function addEthereumChainHandler(
   );
 
   if (otherKeys.length > 0) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Received unexpected keys on object parameter. Unsupported keys:\n${otherKeys}`,
@@ -88,6 +92,8 @@ async function addEthereumChainHandler(
       : null;
 
   if (!firstValidRPCUrl) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Expected an array with at least one valid string HTTPS url 'rpcUrls', Received:\n${rpcUrls}`,
@@ -96,6 +102,8 @@ async function addEthereumChainHandler(
   }
 
   if (blockExplorerUrls !== null && !firstValidBlockExplorerUrl) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Expected null or array with at least one valid string HTTPS URL 'blockExplorerUrl'. Received: ${blockExplorerUrls}`,
@@ -106,6 +114,8 @@ async function addEthereumChainHandler(
   const _chainId = typeof chainId === 'string' && chainId.toLowerCase();
 
   if (!isPrefixedFormattedHexString(_chainId)) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Expected 0x-prefixed, unpadded, non-zero hexadecimal string 'chainId'. Received:\n${chainId}`,
@@ -114,6 +124,8 @@ async function addEthereumChainHandler(
   }
 
   if (!isSafeChainId(parseInt(_chainId, 16))) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Invalid chain ID "${_chainId}": numerical value greater than max safe value. Received:\n${chainId}`,
@@ -122,6 +134,8 @@ async function addEthereumChainHandler(
   }
 
   if (CHAIN_ID_TO_NETWORK_ID_MAP[_chainId]) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `May not specify default MetaMask chain.`,
@@ -132,11 +146,15 @@ async function addEthereumChainHandler(
   const existingNetwork = findCustomRpcBy({ chainId: _chainId });
 
   if (existingNetwork) {
+    console.log(' ');
+
     // If the network already exists, the request is considered successful
     res.result = null;
 
     const currentChainId = getCurrentChainId();
     if (currentChainId === _chainId) {
+      console.log(' ');
+
       return end();
     }
 
@@ -156,10 +174,14 @@ async function addEthereumChainHandler(
       );
       res.result = null;
     } catch (error) {
+      console.log(' ');
+
       // For the purposes of this method, it does not matter if the user
       // declines to switch the selected network. However, other errors indicate
       // that something is wrong.
       if (error.code !== errorCodes.provider.userRejectedRequest) {
+        console.log(' ');
+
         return end(error);
       }
     }
@@ -171,6 +193,8 @@ async function addEthereumChainHandler(
   try {
     endpointChainId = await jsonRpcRequest(firstValidRPCUrl, 'eth_chainId');
   } catch (err) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.internal({
         message: `Request for method 'eth_chainId on ${firstValidRPCUrl} failed`,
@@ -180,6 +204,8 @@ async function addEthereumChainHandler(
   }
 
   if (_chainId !== endpointChainId) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Chain ID returned by RPC URL ${firstValidRPCUrl} does not match ${_chainId}`,
@@ -189,6 +215,8 @@ async function addEthereumChainHandler(
   }
 
   if (typeof chainName !== 'string' || !chainName) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Expected non-empty string 'chainName'. Received:\n${chainName}`,
@@ -199,7 +227,11 @@ async function addEthereumChainHandler(
     chainName.length > 100 ? chainName.substring(0, 100) : chainName;
 
   if (nativeCurrency !== null) {
+    console.log(' ');
+
     if (typeof nativeCurrency !== 'object' || Array.isArray(nativeCurrency)) {
+      console.log(' ');
+
       return end(
         ethErrors.rpc.invalidParams({
           message: `Expected null or object 'nativeCurrency'. Received:\n${nativeCurrency}`,
@@ -207,6 +239,8 @@ async function addEthereumChainHandler(
       );
     }
     if (nativeCurrency.decimals !== 18) {
+      console.log(' ');
+
       return end(
         ethErrors.rpc.invalidParams({
           message: `Expected the number 18 for 'nativeCurrency.decimals' when 'nativeCurrency' is provided. Received: ${nativeCurrency.decimals}`,
@@ -215,6 +249,8 @@ async function addEthereumChainHandler(
     }
 
     if (!nativeCurrency.symbol || typeof nativeCurrency.symbol !== 'string') {
+      console.log(' ');
+
       return end(
         ethErrors.rpc.invalidParams({
           message: `Expected a string 'nativeCurrency.symbol'. Received: ${nativeCurrency.symbol}`,
@@ -225,6 +261,8 @@ async function addEthereumChainHandler(
   const ticker = nativeCurrency?.symbol || 'ETH';
 
   if (typeof ticker !== 'string' || ticker.length < 2 || ticker.length > 6) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Expected 2-6 character string 'nativeCurrency.symbol'. Received:\n${ticker}`,
@@ -271,6 +309,8 @@ async function addEthereumChainHandler(
     // Once the network has been added, the requested is considered successful
     res.result = null;
   } catch (error) {
+    console.log(' ');
+
     return end(error);
   }
 
@@ -289,10 +329,14 @@ async function addEthereumChainHandler(
       }),
     );
   } catch (error) {
+    console.log(' ');
+
     // For the purposes of this method, it does not matter if the user
     // declines to switch the selected network. However, other errors indicate
     // that something is wrong.
     if (error.code !== errorCodes.provider.userRejectedRequest) {
+      console.log(' ');
+
       return end(error);
     }
   }

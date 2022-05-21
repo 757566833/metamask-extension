@@ -39,6 +39,8 @@ async function watchAssetHandler(
     res.result = await handleWatchAssetRequest(asset, type);
     return end();
   } catch (error) {
+    console.log(' ');
+
     return end(error);
   }
 }

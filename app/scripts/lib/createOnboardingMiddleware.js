@@ -12,14 +12,22 @@ export default function createOnboardingMiddleware({
   registerOnboarding,
 }) {
   return async function originMiddleware(req, res, next, end) {
+    console.log(' ');
+
+    console.log('function originMiddleware');
+
     console.log('originMiddleware');
 
     try {
       if (req.method !== 'wallet_registerOnboarding') {
+        console.log(' ');
+
         next();
         return;
       }
       if (req.tabId && req.tabId !== browser.tabs.TAB_ID_NONE) {
+        console.log(' ');
+
         await registerOnboarding(location, req.tabId);
       } else {
         log.debug(
@@ -29,6 +37,8 @@ export default function createOnboardingMiddleware({
       res.result = true;
       end();
     } catch (error) {
+      console.log(' ');
+
       end(error);
     }
   };

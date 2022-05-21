@@ -17,6 +17,8 @@ export default class Migrator extends EventEmitter {
    * @param {MigratorOptions} opts
    */
   constructor(opts = {}) {
+    console.log(' ');
+
     super();
     const migrations = opts.migrations || [];
     // sort migrations by version
@@ -30,15 +32,23 @@ export default class Migrator extends EventEmitter {
 
   // run all pending migrations on meta in place
   async migrateData(versionedData = this.generateInitialState()) {
+    console.log(' ');
+
+    console.log('migrateData');
+
     // get all migrations that have not yet been run
     const pendingMigrations = this.migrations.filter(migrationIsPending);
 
     // perform each migration
     for (const migration of pendingMigrations) {
+      console.log(' ');
+
       try {
         // attempt migration and validate
         const migratedData = await migration.migrate(versionedData);
         if (!migratedData.data) {
+          console.log(' ');
+
           throw new Error('Migrator - migration returned empty data');
         }
         if (
@@ -53,6 +63,8 @@ export default class Migrator extends EventEmitter {
         // eslint-disable-next-line no-param-reassign
         versionedData = migratedData;
       } catch (err) {
+        console.log(' ');
+
         // rewrite error message to add context without clobbering stack
         const originalErrorMessage = err.message;
         err.message = `MetaMask Migration Error #${migration.version}: ${originalErrorMessage}`;
@@ -75,6 +87,8 @@ export default class Migrator extends EventEmitter {
      * @returns {boolean}
      */
     function migrationIsPending(migration) {
+      console.log(' ');
+
       return migration.version > versionedData.meta.version;
     }
   }
@@ -86,6 +100,8 @@ export default class Migrator extends EventEmitter {
    * @returns {{meta: {version: number}, data: any}}
    */
   generateInitialState(data) {
+    console.log(' ');
+
     return {
       meta: {
         version: this.defaultVersion,

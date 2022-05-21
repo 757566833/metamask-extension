@@ -30,6 +30,8 @@ export default class MessageManager extends EventEmitter {
    * @param {Function} opts.metricsEvent - A function for emitting a metric event.
    */
   constructor({ metricsEvent }) {
+    console.log(' ');
+
     super();
     this.memStore = new ObservableStore({
       unapprovedMsgs: {},
@@ -71,6 +73,10 @@ export default class MessageManager extends EventEmitter {
    * @returns {promise} after signature has been
    */
   async addUnapprovedMessageAsync(msgParams, req) {
+    console.log(' ');
+
+    console.log('addUnapprovedMessageAsync');
+
     const msgId = this.addUnapprovedMessage(msgParams, req);
     return await new Promise((resolve, reject) => {
       // await finished
@@ -110,8 +116,12 @@ export default class MessageManager extends EventEmitter {
    * @returns {number} The id of the newly created message.
    */
   addUnapprovedMessage(msgParams, req) {
+    console.log(' ');
+
     // add origin from request
     if (req) {
+      console.log(' ');
+
       msgParams.origin = req.origin;
     }
     msgParams.data = normalizeMsgData(msgParams.data);
@@ -139,6 +149,8 @@ export default class MessageManager extends EventEmitter {
    * @param {Message} msg - The Message to add to this.messages
    */
   addMsg(msg) {
+    console.log(' ');
+
     this.messages.push(msg);
     this._saveMsgList();
   }
@@ -150,6 +162,8 @@ export default class MessageManager extends EventEmitter {
    * @returns {Message|undefined} The Message with the id that matches the passed msgId, or undefined if no Message has that id.
    */
   getMsg(msgId) {
+    console.log(' ');
+
     return this.messages.find((msg) => msg.id === msgId);
   }
 
@@ -162,6 +176,8 @@ export default class MessageManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams object with metamaskId removed.
    */
   approveMessage(msgParams) {
+    console.log(' ');
+
     this.setMsgStatusApproved(msgParams.metamaskId);
     return this.prepMsgForSigning(msgParams);
   }
@@ -172,6 +188,8 @@ export default class MessageManager extends EventEmitter {
    * @param {number} msgId - The id of the Message to approve.
    */
   setMsgStatusApproved(msgId) {
+    console.log(' ');
+
     this._setMsgStatus(msgId, 'approved');
   }
 
@@ -183,6 +201,8 @@ export default class MessageManager extends EventEmitter {
    * @param {buffer} rawSig - The raw data of the signature request
    */
   setMsgStatusSigned(msgId, rawSig) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.rawSig = rawSig;
     this._updateMsg(msg);
@@ -196,6 +216,8 @@ export default class MessageManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams with the metamaskId property removed
    */
   prepMsgForSigning(msgParams) {
+    console.log(' ');
+
     delete msgParams.metamaskId;
     return Promise.resolve(msgParams);
   }
@@ -207,7 +229,11 @@ export default class MessageManager extends EventEmitter {
    * @param reason
    */
   rejectMsg(msgId, reason = undefined) {
+    console.log(' ');
+
     if (reason) {
+      console.log(' ');
+
       const msg = this.getMsg(msgId);
       this.metricsEvent({
         event: reason,
@@ -228,6 +254,8 @@ export default class MessageManager extends EventEmitter {
    * @param error
    */
   errorMessage(msgId, error) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.error = error;
     this._updateMsg(msg);
@@ -254,14 +282,20 @@ export default class MessageManager extends EventEmitter {
    * @fires If status is 'rejected' or 'signed', an event with a name equal to `${msgId}:finished` is fired along with the message
    */
   _setMsgStatus(msgId, status) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     if (!msg) {
+      console.log(' ');
+
       throw new Error(`MessageManager - Message not found for id: "${msgId}".`);
     }
     msg.status = status;
     this._updateMsg(msg);
     this.emit(`${msgId}:${status}`, msg);
     if (status === 'rejected' || status === 'signed') {
+      console.log(' ');
+
       this.emit(`${msgId}:finished`, msg);
     }
   }
@@ -274,8 +308,12 @@ export default class MessageManager extends EventEmitter {
    * @param {Message} msg - A Message that will replace an existing Message (with the same id) in this.messages
    */
   _updateMsg(msg) {
+    console.log(' ');
+
     const index = this.messages.findIndex((message) => message.id === msg.id);
     if (index !== -1) {
+      console.log(' ');
+
       this.messages[index] = msg;
     }
     this._saveMsgList();
@@ -302,7 +340,11 @@ export default class MessageManager extends EventEmitter {
  * @returns {string} A hex string conversion of the buffer data
  */
 export function normalizeMsgData(data) {
+  console.log(' ');
+
   if (data.slice(0, 2) === '0x') {
+    console.log(' ');
+
     // data is already hex
     return data;
   }

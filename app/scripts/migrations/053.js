@@ -9,6 +9,10 @@ const version = 53;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -18,12 +22,18 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const transactions = state?.TransactionController?.transactions;
   const incomingTransactions =
     state?.IncomingTransactionsController?.incomingTransactions;
   if (Array.isArray(transactions)) {
+    console.log(' ');
+
     transactions.forEach((transaction) => {
       if (transaction) {
+        console.log(' ');
+
         if (
           transaction.type !== TRANSACTION_TYPES.RETRY &&
           transaction.type !== TRANSACTION_TYPES.CANCEL
@@ -35,9 +45,13 @@ function transformState(state) {
     });
   }
   if (incomingTransactions) {
+    console.log(' ');
+
     const incomingTransactionsEntries = Object.entries(incomingTransactions);
     incomingTransactionsEntries.forEach(([key, transaction]) => {
       if (transaction) {
+        console.log(' ');
+
         delete transaction.transactionCategory;
         state.IncomingTransactionsController.incomingTransactions[key] = {
           ...transaction,

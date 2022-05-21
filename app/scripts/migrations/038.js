@@ -8,6 +8,10 @@ const version = 38;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -17,10 +21,14 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const { ABTestController: ABTestControllerState = {} } = state;
   const { abTests = {} } = ABTestControllerState;
 
   if (abTests.fullScreenVsPopup) {
+    console.log(' ');
+
     return state;
   }
 

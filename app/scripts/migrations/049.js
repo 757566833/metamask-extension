@@ -8,6 +8,10 @@ const version = 49;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -17,7 +21,11 @@ export default {
 };
 
 function transformState(state = {}) {
+  console.log(' ');
+
   if (state.PreferencesController) {
+    console.log(' ');
+
     const {
       metaMetricsId,
       participateInMetaMetrics,
@@ -26,16 +34,22 @@ function transformState(state = {}) {
     state.MetaMetricsController = state.MetaMetricsController ?? {};
 
     if (metaMetricsId !== undefined) {
+      console.log(' ');
+
       state.MetaMetricsController.metaMetricsId = metaMetricsId;
       delete state.PreferencesController.metaMetricsId;
     }
 
     if (participateInMetaMetrics !== undefined) {
+      console.log(' ');
+
       state.MetaMetricsController.participateInMetaMetrics = participateInMetaMetrics;
       delete state.PreferencesController.participateInMetaMetrics;
     }
 
     if (metaMetricsSendCount !== undefined) {
+      console.log(' ');
+
       state.MetaMetricsController.metaMetricsSendCount = metaMetricsSendCount;
       delete state.PreferencesController.metaMetricsSendCount;
     }

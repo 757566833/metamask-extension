@@ -9,6 +9,10 @@ const version = 66;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -19,6 +23,8 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const defaultTransportType = window.navigator.hid
     ? LEDGER_TRANSPORT_TYPES.WEBHID
     : LEDGER_TRANSPORT_TYPES.U2F;

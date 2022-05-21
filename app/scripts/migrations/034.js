@@ -9,6 +9,10 @@ const version = 34;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -18,9 +22,13 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const { PreferencesController } = state;
 
   if (PreferencesController) {
+    console.log(' ');
+
     const featureFlags = PreferencesController.featureFlags || {};
 
     if (

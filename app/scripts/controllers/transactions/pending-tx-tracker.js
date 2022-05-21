@@ -39,6 +39,8 @@ export default class PendingTransactionTracker extends EventEmitter {
    * @param {Function} config.publishTransaction - Publishes a raw transaction,
    */
   constructor(config) {
+    console.log(' ');
+
     super();
     this.query = config.query || new EthQuery(config.provider);
     this.nonceTracker = config.nonceTracker;
@@ -53,6 +55,8 @@ export default class PendingTransactionTracker extends EventEmitter {
    * checks the network for signed txs and releases the nonce global lock if it is
    */
   async updatePendingTxs() {
+    console.log('updatePendingTxs');
+
     // in order to keep the nonceTracker accurate we block it while updating pending transactions
     const nonceGlobalLock = await this.nonceTracker.getGlobalLock();
     try {
@@ -61,6 +65,8 @@ export default class PendingTransactionTracker extends EventEmitter {
         pendingTxs.map((txMeta) => this._checkPendingTx(txMeta)),
       );
     } catch (err) {
+      console.log(' ');
+
       log.error(
         'PendingTransactionTracker - Error updating pending transactions',
       );
@@ -77,14 +83,24 @@ export default class PendingTransactionTracker extends EventEmitter {
    * @returns {Promise<void>}
    */
   async resubmitPendingTxs(blockNumber) {
+    console.log(' ');
+
+    console.log('resubmitPendingTxs');
+
     const pending = this.getPendingTransactions();
     if (!pending.length) {
+      console.log(' ');
+
       return;
     }
     for (const txMeta of pending) {
+      console.log(' ');
+
       try {
         await this._resubmitTx(txMeta, blockNumber);
       } catch (err) {
+        console.log(' ');
+
         const errorMessage =
           err.value?.message?.toLowerCase() || err.message.toLowerCase();
         const isKnownTx =
@@ -101,6 +117,8 @@ export default class PendingTransactionTracker extends EventEmitter {
           errorMessage.includes('nonce too low');
         // ignore resubmit warnings, return early
         if (isKnownTx) {
+          console.log(' ');
+
           return;
         }
         // encountered real error - transition to error state
@@ -126,7 +144,13 @@ export default class PendingTransactionTracker extends EventEmitter {
    * @private
    */
   async _resubmitTx(txMeta, latestBlockNumber) {
+    console.log(' ');
+
+    console.log('_resubmitTx');
+
     if (!txMeta.firstRetryBlockNumber) {
+      console.log(' ');
+
       this.emit('tx:block-update', txMeta, latestBlockNumber);
     }
 
@@ -140,11 +164,15 @@ export default class PendingTransactionTracker extends EventEmitter {
 
     // Exponential backoff to limit retries at publishing (capped at ~15 minutes between retries)
     if (txBlockDistance < Math.min(50, Math.pow(2, retryCount))) {
+      console.log(' ');
+
       return undefined;
     }
 
     // Only auto-submit already-signed txs:
     if (!('rawTx' in txMeta)) {
+      console.log(' ');
+
       return this.approveTransaction(txMeta.id);
     }
 
@@ -169,17 +197,25 @@ export default class PendingTransactionTracker extends EventEmitter {
    */
 
   async _checkPendingTx(txMeta) {
+    console.log(' ');
+
+    console.log('_checkPendingTx');
+
     const txHash = txMeta.hash;
     const txId = txMeta.id;
 
     // Only check submitted txs
     if (txMeta.status !== TRANSACTION_STATUSES.SUBMITTED) {
+      console.log(' ');
+
       return;
     }
 
     // extra check in case there was an uncaught error during the
     // signature and submission process
     if (!txHash) {
+      console.log(' ');
+
       const noTxHashErr = new Error(
         'We had an error while submitting this transaction, please try again.',
       );
@@ -190,6 +226,8 @@ export default class PendingTransactionTracker extends EventEmitter {
     }
 
     if (await this._checkIfNonceIsTaken(txMeta)) {
+      console.log(' ');
+
       this.emit('tx:dropped', txId);
       return;
     }
@@ -197,6 +235,8 @@ export default class PendingTransactionTracker extends EventEmitter {
     try {
       const transactionReceipt = await this.query.getTransactionReceipt(txHash);
       if (transactionReceipt?.blockNumber) {
+        console.log(' ');
+
         const {
           baseFeePerGas,
           timestamp: blockTimestamp,
@@ -215,6 +255,8 @@ export default class PendingTransactionTracker extends EventEmitter {
         return;
       }
     } catch (err) {
+      console.log(' ');
+
       txMeta.warning = {
         error: err.message,
         message: 'There was a problem loading this transaction.',
@@ -224,6 +266,8 @@ export default class PendingTransactionTracker extends EventEmitter {
     }
 
     if (await this._checkIfTxWasDropped(txMeta)) {
+      console.log(' ');
+
       this.emit('tx:dropped', txId);
     }
   }
@@ -236,6 +280,10 @@ export default class PendingTransactionTracker extends EventEmitter {
    * @private
    */
   async _checkIfTxWasDropped(txMeta) {
+    console.log(' ');
+
+    console.log('_checkIfTxWasDropped');
+
     const {
       hash: txHash,
       txParams: { nonce, from },
@@ -243,16 +291,22 @@ export default class PendingTransactionTracker extends EventEmitter {
     const networkNextNonce = await this.query.getTransactionCount(from);
 
     if (parseInt(nonce, 16) >= networkNextNonce.toNumber()) {
+      console.log(' ');
+
       return false;
     }
 
     if (!this.droppedBlocksBufferByHash.has(txHash)) {
+      console.log(' ');
+
       this.droppedBlocksBufferByHash.set(txHash, 0);
     }
 
     const currentBlockBuffer = this.droppedBlocksBufferByHash.get(txHash);
 
     if (currentBlockBuffer < this.DROPPED_BUFFER_COUNT) {
+      console.log(' ');
+
       this.droppedBlocksBufferByHash.set(txHash, currentBlockBuffer + 1);
       return false;
     }
@@ -269,6 +323,10 @@ export default class PendingTransactionTracker extends EventEmitter {
    * @private
    */
   async _checkIfNonceIsTaken(txMeta) {
+    console.log(' ');
+
+    console.log('_checkIfNonceIsTaken');
+
     const address = txMeta.txParams.from;
     const completed = this.getCompletedTransactions(address);
     return completed.some(

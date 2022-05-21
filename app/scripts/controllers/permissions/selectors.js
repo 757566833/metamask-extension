@@ -30,6 +30,8 @@ export const getPermittedAccountsByOrigin = createSelector(
       );
 
       if (caveat) {
+        console.log(' ');
+
         originToAccountsMap.set(subject.origin, caveat.value);
       }
       return originToAccountsMap;
@@ -50,17 +52,23 @@ export const getPermittedAccountsByOrigin = createSelector(
  */
 export const getChangedAccounts = (newAccountsMap, previousAccountsMap) => {
   if (previousAccountsMap === undefined) {
+    console.log(' ');
+
     return newAccountsMap;
   }
 
   const changedAccounts = new Map();
   if (newAccountsMap === previousAccountsMap) {
+    console.log(' ');
+
     return changedAccounts;
   }
 
   const newOrigins = new Set([...newAccountsMap.keys()]);
 
   for (const origin of previousAccountsMap.keys()) {
+    console.log(' ');
+
     const newAccounts = newAccountsMap.get(origin) ?? [];
 
     // The values of these maps are references to immutable values, which is why
@@ -69,6 +77,8 @@ export const getChangedAccounts = (newAccountsMap, previousAccountsMap) => {
     // call to this function. `newAccountsMap` will never contain any empty
     // arrays.
     if (previousAccountsMap.get(origin) !== newAccounts) {
+      console.log(' ');
+
       changedAccounts.set(origin, newAccounts);
     }
 
@@ -78,6 +88,8 @@ export const getChangedAccounts = (newAccountsMap, previousAccountsMap) => {
   // By now, newOrigins is either empty or contains some number of previously
   // unencountered origins, and all of their accounts have "changed".
   for (const origin of newOrigins.keys()) {
+    console.log(' ');
+
     changedAccounts.set(origin, newAccountsMap.get(origin));
   }
   return changedAccounts;

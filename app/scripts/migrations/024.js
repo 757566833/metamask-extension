@@ -14,6 +14,10 @@ export default {
   version,
 
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -24,8 +28,12 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const newState = state;
   if (!newState.TransactionController) {
+    console.log(' ');
+
     return newState;
   }
   const { transactions } = newState.TransactionController;

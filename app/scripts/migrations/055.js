@@ -9,6 +9,10 @@ const version = 55;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -20,6 +24,8 @@ export default {
 const UNKNOWN_CHAIN_ID_KEY = 'UNKNOWN';
 
 function transformState(state) {
+  console.log(' ');
+
   if (
     state?.IncomingTransactionsController?.incomingTxLastFetchedBlocksByNetwork
   ) {

@@ -5,6 +5,8 @@ import {
 } from '../../../../shared/constants/permissions';
 
 export function getPermissionBackgroundApiMethods(permissionController) {
+  console.log(' ');
+
   return {
     addPermittedAccount: (origin, account) => {
       const existing = permissionController.getCaveat(
@@ -14,6 +16,8 @@ export function getPermissionBackgroundApiMethods(permissionController) {
       );
 
       if (existing.value.includes(account)) {
+        console.log(' ');
+
         throw new Error(
           `eth_accounts permission for origin "${origin}" already permits account "${account}".`,
         );
@@ -35,6 +39,8 @@ export function getPermissionBackgroundApiMethods(permissionController) {
       );
 
       if (!existing.value.includes(account)) {
+        console.log(' ');
+
         throw new Error(
           `eth_accounts permission for origin "${origin}" already does not permit account "${account}".`,
         );
@@ -45,6 +51,8 @@ export function getPermissionBackgroundApiMethods(permissionController) {
       );
 
       if (remainingAccounts.length === 0) {
+        console.log(' ');
+
         permissionController.revokePermission(
           origin,
           RestrictedMethods.eth_accounts,

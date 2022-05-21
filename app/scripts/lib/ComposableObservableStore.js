@@ -32,10 +32,14 @@ export default class ComposableObservableStore extends ObservableStore {
    * @param {boolean} [options.persist] - Whether or not to apply the persistence for v2 controllers
    */
   constructor({ config, controllerMessenger, state, persist }) {
+    console.log(' ');
+
     super(state);
     this.persist = persist;
     this.controllerMessenger = controllerMessenger;
     if (config) {
+      console.log(' ');
+
       this.updateStructure(config);
     }
   }
@@ -49,14 +53,22 @@ export default class ComposableObservableStore extends ObservableStore {
    *   controllers in the `@metamask/controllers` package.
    */
   updateStructure(config) {
+    console.log(' ');
+
     this.config = config;
     this.removeAllListeners();
     for (const key of Object.keys(config)) {
+      console.log(' ');
+
       if (!config[key]) {
+        console.log(' ');
+
         throw new Error(`Undefined '${key}'`);
       }
       const store = config[key];
       if (store.subscribe) {
+        console.log(' ');
+
         config[key].subscribe((state) => {
           this.updateState({ [key]: state });
         });
@@ -66,6 +78,8 @@ export default class ComposableObservableStore extends ObservableStore {
           (state) => {
             let updatedState = state;
             if (this.persist) {
+              console.log(' ');
+
               updatedState = getPersistentState(state, config[key].metadata);
             }
             this.updateState({ [key]: updatedState });
@@ -83,10 +97,14 @@ export default class ComposableObservableStore extends ObservableStore {
    */
   getFlatState() {
     if (!this.config) {
+      console.log(' ');
+
       return {};
     }
     let flatState = {};
     for (const key of Object.keys(this.config)) {
+      console.log(' ');
+
       const controller = this.config[key];
       const state = controller.getState
         ? controller.getState()

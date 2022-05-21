@@ -15,7 +15,13 @@ const seedPhraseVerifier = {
    * @returns {Promise<void>}
    */
   async verifyAccounts(createdAccounts, seedPhrase) {
+    console.log(' ');
+
+    console.log('verifyAccounts');
+
     if (!createdAccounts || createdAccounts.length < 1) {
+      console.log(' ');
+
       throw new Error('No created accounts defined.');
     }
 
@@ -32,11 +38,15 @@ const seedPhraseVerifier = {
     log.debug(`Restored accounts: ${JSON.stringify(restoredAccounts)}`);
 
     if (restoredAccounts.length !== createdAccounts.length) {
+      console.log(' ');
+
       // this should not happen...
       throw new Error('Wrong number of accounts');
     }
 
     for (let i = 0; i < restoredAccounts.length; i++) {
+      console.log(' ');
+
       if (
         restoredAccounts[i].toLowerCase() !== createdAccounts[i].toLowerCase()
       ) {

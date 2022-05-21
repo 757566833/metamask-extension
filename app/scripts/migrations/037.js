@@ -11,6 +11,10 @@ const version = 37;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -20,7 +24,11 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   if (state.AddressBookController) {
+    console.log(' ');
+
     const ab = state.AddressBookController.addressBook;
 
     const chainIds = new Set();
@@ -33,12 +41,18 @@ function transformState(state) {
 
     // fill the chainId object with the entries with the matching chainId
     for (const id of chainIds.values()) {
+      console.log(' ');
+
       // make an empty object entry for each chainId
       newAddressBook[id] = {};
       for (const address in ab) {
         if (ab[address].chainId === id) {
+          console.log(' ');
+
           ab[address].isEns = false;
           if (util.normalizeEnsName(ab[address].name)) {
+            console.log(' ');
+
             ab[address].isEns = true;
           }
           newAddressBook[id][address] = ab[address];

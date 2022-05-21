@@ -30,6 +30,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @param {Function} opts.metricEvent - A function for emitting a metric event.
    */
   constructor(opts) {
+    console.log(' ');
+
     super();
     this.memStore = new ObservableStore({
       unapprovedEncryptionPublicKeyMsgs: {},
@@ -73,8 +75,12 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @returns {Promise<Buffer>} The raw public key contents
    */
   addUnapprovedMessageAsync(address, req) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       if (!address) {
+        console.log(' ');
+
         reject(new Error('MetaMask Message: address field is required.'));
         return;
       }
@@ -114,6 +120,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @returns {number} The id of the newly created EncryptionPublicKey.
    */
   addUnapprovedMessage(address, req) {
+    console.log(' ');
+
     log.debug(`EncryptionPublicKeyManager addUnapprovedMessage: address`);
     // create txData obj with parameters and meta data
     const time = new Date().getTime();
@@ -127,6 +135,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
     };
 
     if (req) {
+      console.log(' ');
+
       msgData.origin = req.origin;
     }
 
@@ -144,6 +154,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @param {Message} msg - The EncryptionPublicKey to add to this.messages
    */
   addMsg(msg) {
+    console.log(' ');
+
     this.messages.push(msg);
     this._saveMsgList();
   }
@@ -156,6 +168,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * if no EncryptionPublicKey has that id.
    */
   getMsg(msgId) {
+    console.log(' ');
+
     return this.messages.find((msg) => msg.id === msgId);
   }
 
@@ -168,6 +182,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams object with metamaskId removed.
    */
   approveMessage(msgParams) {
+    console.log(' ');
+
     this.setMsgStatusApproved(msgParams.metamaskId);
     return this.prepMsgForEncryptionPublicKey(msgParams);
   }
@@ -178,6 +194,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @param {number} msgId - The id of the EncryptionPublicKey to approve.
    */
   setMsgStatusApproved(msgId) {
+    console.log(' ');
+
     this._setMsgStatus(msgId, 'approved');
   }
 
@@ -189,6 +207,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @param {buffer} rawData - The raw data of the message request
    */
   setMsgStatusReceived(msgId, rawData) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.rawData = rawData;
     this._updateMsg(msg);
@@ -202,6 +222,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams with the metamaskId property removed
    */
   prepMsgForEncryptionPublicKey(msgParams) {
+    console.log(' ');
+
     delete msgParams.metamaskId;
     return Promise.resolve(msgParams);
   }
@@ -213,7 +235,11 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @param reason
    */
   rejectMsg(msgId, reason = undefined) {
+    console.log(' ');
+
     if (reason) {
+      console.log(' ');
+
       this.metricsEvent({
         event: reason,
         category: 'Messages',
@@ -232,6 +258,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * @param error
    */
   errorMessage(msgId, error) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.error = error;
     this._updateMsg(msg);
@@ -259,8 +287,12 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * with the EncryptionPublicKey
    */
   _setMsgStatus(msgId, status) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     if (!msg) {
+      console.log(' ');
+
       throw new Error(
         `EncryptionPublicKeyManager - Message not found for id: "${msgId}".`,
       );
@@ -269,6 +301,8 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
     this._updateMsg(msg);
     this.emit(`${msgId}:${status}`, msg);
     if (status === 'rejected' || status === 'received') {
+      console.log(' ');
+
       this.emit(`${msgId}:finished`, msg);
     }
   }
@@ -282,8 +316,12 @@ export default class EncryptionPublicKeyManager extends EventEmitter {
    * id) in this.messages
    */
   _updateMsg(msg) {
+    console.log(' ');
+
     const index = this.messages.findIndex((message) => message.id === msg.id);
     if (index !== -1) {
+      console.log(' ');
+
       this.messages[index] = msg;
     }
     this._saveMsgList();

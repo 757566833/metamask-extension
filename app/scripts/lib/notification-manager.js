@@ -34,10 +34,14 @@ export default class NotificationManager extends EventEmitter {
    *
    */
   async showPopup() {
+    console.log('showPopup');
+
     const popup = await this._getPopup();
 
     // Bring focus to chrome popup
     if (popup) {
+      console.log(' ');
+
       // bring focus to existing chrome popup
       await this.platform.focusWindow(popup.id);
     } else {
@@ -49,6 +53,8 @@ export default class NotificationManager extends EventEmitter {
         top = lastFocused.top;
         left = lastFocused.left + (lastFocused.width - NOTIFICATION_WIDTH);
       } catch (_) {
+        console.log(' ');
+
         // The following properties are more than likely 0, due to being
         // opened from the background chrome process for the extension that
         // has no physical dimensions
@@ -69,6 +75,8 @@ export default class NotificationManager extends EventEmitter {
 
       // Firefox currently ignores left/top for create, but it works for update
       if (popupWindow.left !== left && popupWindow.state !== 'fullscreen') {
+        console.log(' ');
+
         await this.platform.updateWindowPosition(popupWindow.id, left, top);
       }
       this._popupId = popupWindow.id;
@@ -76,7 +84,11 @@ export default class NotificationManager extends EventEmitter {
   }
 
   _onWindowClosed(windowId) {
+    console.log(' ');
+
     if (windowId === this._popupId) {
+      console.log(' ');
+
       this._popupId = undefined;
       this.emit(NOTIFICATION_MANAGER_EVENTS.POPUP_CLOSED, {
         automaticallyClosed: this._popupAutomaticallyClosed,
@@ -92,6 +104,8 @@ export default class NotificationManager extends EventEmitter {
    * @private
    */
   async _getPopup() {
+    console.log('_getPopup');
+
     const windows = await this.platform.getAllWindows();
     return this._getPopupIn(windows);
   }
@@ -103,6 +117,8 @@ export default class NotificationManager extends EventEmitter {
    * @param {Array} windows - An array of objects containing data about the open MetaMask extension windows.
    */
   _getPopupIn(windows) {
+    console.log(' ');
+
     return windows
       ? windows.find((win) => {
           // Returns notification popup

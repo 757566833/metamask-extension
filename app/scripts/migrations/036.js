@@ -8,6 +8,10 @@ const version = 36;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -17,12 +21,18 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const { PreferencesController } = state;
 
   if (PreferencesController) {
+    console.log(' ');
+
     const featureFlags = PreferencesController.featureFlags || {};
 
     if (typeof featureFlags.privacyMode !== 'undefined') {
+      console.log(' ');
+
       delete featureFlags.privacyMode;
     }
   }

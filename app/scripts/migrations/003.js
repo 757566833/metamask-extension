@@ -8,13 +8,19 @@ export default {
   version,
 
   migrate(originalVersionedData) {
+    console.log(' ');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     try {
       if (versionedData.data.config.provider.rpcTarget === oldTestRpc) {
+        console.log(' ');
+
         versionedData.data.config.provider.rpcTarget = newTestRpc;
       }
     } catch (_) {
+      console.log(' ');
+
       // empty
     }
     return Promise.resolve(versionedData);

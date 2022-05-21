@@ -11,6 +11,10 @@ export default {
   version,
 
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -21,9 +25,13 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const { KeyringController, PreferencesController } = state;
 
   if (KeyringController && PreferencesController) {
+    console.log(' ');
+
     const { vault } = KeyringController;
     PreferencesController.completedOnboarding = Boolean(vault);
   }

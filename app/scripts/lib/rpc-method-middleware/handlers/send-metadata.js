@@ -40,6 +40,8 @@ function sendMetadataHandler(
 ) {
   const { origin, params } = req;
   if (params && typeof params === 'object' && !Array.isArray(params)) {
+    console.log(' ');
+
     const { icon = null, name = null, ...remainingParams } = params;
 
     addSubjectMetadata({

@@ -19,6 +19,8 @@ const SYNC_TIMEOUT = 60 * 1000; // one minute
 
 export default class ThreeBoxController {
   constructor(opts = {}) {
+    console.log(' ');
+
     const {
       preferencesController,
       keyringController,
@@ -35,6 +37,8 @@ export default class ThreeBoxController {
       version,
       getAccounts: async ({ origin }) => {
         if (origin !== '3Box') {
+          console.log(' ');
+
           return [];
         }
         const { isUnlocked } = getKeyringControllerState();
@@ -42,6 +46,8 @@ export default class ThreeBoxController {
         const accounts = await this.keyringController.getAccounts();
 
         if (isUnlocked && accounts[0]) {
+          console.log(' ');
+
           const appKeyAddress = await this.keyringController.getAppKeyAddress(
             accounts[0],
             'wallet://3box.metamask.io',
@@ -78,11 +84,15 @@ export default class ThreeBoxController {
       .slice(-1)[0];
 
     if (initState.threeBoxSyncingAllowed) {
+      console.log(' ');
+
       this.init();
     }
   }
 
   async init() {
+    console.log('init');
+
     const accounts = await this.keyringController.getAccounts();
     this.address = accounts[0];
 
@@ -92,14 +102,20 @@ export default class ThreeBoxController {
     });
 
     if (this.address && !(this.box && this.store.getState().threeBoxSynced)) {
+      console.log(' ');
+
       await this.new3Box();
     }
   }
 
   async _update3Box() {
+    console.log('_update3Box');
+
     try {
       const { threeBoxSyncingAllowed, threeBoxSynced } = this.store.getState();
       if (threeBoxSyncingAllowed && threeBoxSynced) {
+        console.log(' ');
+
         const newState = {
           preferences: this.preferencesController.store.getState(),
           addressBook: this.addressBookController.state,
@@ -114,11 +130,15 @@ export default class ThreeBoxController {
         await this.setShowRestorePromptToFalse();
       }
     } catch (error) {
+      console.log(' ');
+
       console.error(error);
     }
   }
 
   _createProvider(providerOpts) {
+    console.log(' ');
+
     const metamaskMiddleware = createMetamaskMiddleware(providerOpts);
     const engine = new JsonRpcEngine();
     engine.push(createOriginMiddleware({ origin: '3Box' }));
@@ -137,6 +157,8 @@ export default class ThreeBoxController {
   }
 
   async new3Box() {
+    console.log('new3Box');
+
     const accounts = await this.keyringController.getAccounts();
     this.address = await this.keyringController.getAppKeyAddress(
       accounts[0],
@@ -147,7 +169,11 @@ export default class ThreeBoxController {
       const threeBoxConfig = await Box.getConfig(this.address);
       backupExists = threeBoxConfig.spaces && threeBoxConfig.spaces.metamask;
     } catch (e) {
+      console.log(' ');
+
       if (e.message.match(/^Error: Invalid response \(404\)/u)) {
+        console.log(' ');
+
         this._trackMetaMetricsEvent({
           event: '3Box Backup does not exist',
           category: '3Box',
@@ -164,6 +190,8 @@ export default class ThreeBoxController {
       }
     }
     if (this.getThreeBoxSyncingState() || backupExists) {
+      console.log(' ');
+
       this.store.updateState({ threeBoxSynced: false });
 
       let timedOut = false;
@@ -185,6 +213,8 @@ export default class ThreeBoxController {
               threeBoxAddress: this.address,
             };
             if (timedOut) {
+              console.log(' ');
+
               log.info(`3Box sync completed after timeout; no longer disabled`);
               stateUpdate.threeBoxDisabled = false;
             }
@@ -201,6 +231,8 @@ export default class ThreeBoxController {
           },
         });
       } catch (e) {
+        console.log(' ');
+
         this._trackMetaMetricsEvent({
           event: '3Box Initiation Error',
           category: '3Box',
@@ -213,12 +245,18 @@ export default class ThreeBoxController {
   }
 
   async getLastUpdated() {
+    console.log('getLastUpdated');
+
     const res = await this.space.private.get('metamaskBackup');
     const parsedRes = JSON.parse(res || '{}');
     return parsedRes.lastUpdated;
   }
 
   async migrateBackedUpState(backedUpState) {
+    console.log(' ');
+
+    console.log('migrateBackedUpState');
+
     const migrator = new Migrator({ migrations });
     const { preferences, addressBook } = JSON.parse(backedUpState);
     const formattedStateBackup = {
@@ -236,6 +274,8 @@ export default class ThreeBoxController {
   }
 
   async restoreFromThreeBox() {
+    console.log('restoreFromThreeBox');
+
     const backedUpState = await this.space.private.get('metamaskBackup');
     const { preferences, addressBook } = await this.migrateBackedUpState(
       backedUpState,
@@ -274,7 +314,11 @@ export default class ThreeBoxController {
   }
 
   setThreeBoxSyncingPermission(newThreeboxSyncingState) {
+    console.log(' ');
+
     if (this.store.getState().threeBoxDisabled) {
+      console.log(' ');
+
       return;
     }
     this.store.updateState({
@@ -282,10 +326,14 @@ export default class ThreeBoxController {
     });
 
     if (newThreeboxSyncingState && this.box) {
+      console.log(' ');
+
       this.turnThreeBoxSyncingOn();
     }
 
     if (!newThreeboxSyncingState && this.box) {
+      console.log(' ');
+
       this.turnThreeBoxSyncingOff();
     }
   }
@@ -296,6 +344,8 @@ export default class ThreeBoxController {
 
   _registerUpdates() {
     if (!this.registeringUpdates) {
+      console.log(' ');
+
       const updatePreferences = this._update3Box.bind(this);
       this.preferencesController.store.subscribe(updatePreferences);
       const updateAddressBook = this._update3Box.bind(this);

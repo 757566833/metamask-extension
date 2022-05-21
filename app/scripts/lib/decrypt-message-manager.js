@@ -34,6 +34,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * @param {Function} opts.metricEvent - A function for emitting a metric event.
    */
   constructor(opts) {
+    console.log(' ');
+
     super();
     this.memStore = new ObservableStore({
       unapprovedDecryptMsgs: {},
@@ -77,8 +79,12 @@ export default class DecryptMessageManager extends EventEmitter {
    * @returns {Promise<Buffer>} The raw decrypted message contents
    */
   addUnapprovedMessageAsync(msgParams, req) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       if (!msgParams.from) {
+        console.log(' ');
+
         reject(new Error('MetaMask Decryption: from field is required.'));
         return;
       }
@@ -121,6 +127,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * @returns {number} The id of the newly created DecryptMessage.
    */
   addUnapprovedMessage(msgParams, req) {
+    console.log(' ');
+
     log.debug(
       `DecryptMessageManager addUnapprovedMessage: ${JSON.stringify(
         msgParams,
@@ -128,6 +136,8 @@ export default class DecryptMessageManager extends EventEmitter {
     );
     // add origin from request
     if (req) {
+      console.log(' ');
+
       msgParams.origin = req.origin;
     }
     msgParams.data = this.normalizeMsgData(msgParams.data);
@@ -155,6 +165,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * @param {Message} msg - The DecryptMessage to add to this.messages
    */
   addMsg(msg) {
+    console.log(' ');
+
     this.messages.push(msg);
     this._saveMsgList();
   }
@@ -167,6 +179,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * if no DecryptMessage has that id.
    */
   getMsg(msgId) {
+    console.log(' ');
+
     return this.messages.find((msg) => msg.id === msgId);
   }
 
@@ -179,6 +193,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams object with metamaskId removed.
    */
   approveMessage(msgParams) {
+    console.log(' ');
+
     this.setMsgStatusApproved(msgParams.metamaskId);
     return this.prepMsgForDecryption(msgParams);
   }
@@ -189,6 +205,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * @param {number} msgId - The id of the DecryptMessage to approve.
    */
   setMsgStatusApproved(msgId) {
+    console.log(' ');
+
     this._setMsgStatus(msgId, 'approved');
   }
 
@@ -200,6 +218,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * @param {buffer} rawData - The raw data of the message request
    */
   setMsgStatusDecrypted(msgId, rawData) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.rawData = rawData;
     this._updateMsg(msg);
@@ -213,6 +233,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * @returns {Promise<object>} Promises the msgParams with the metamaskId property removed
    */
   prepMsgForDecryption(msgParams) {
+    console.log(' ');
+
     delete msgParams.metamaskId;
     return Promise.resolve(msgParams);
   }
@@ -224,7 +246,11 @@ export default class DecryptMessageManager extends EventEmitter {
    * @param reason
    */
   rejectMsg(msgId, reason = undefined) {
+    console.log(' ');
+
     if (reason) {
+      console.log(' ');
+
       this.metricsEvent({
         event: reason,
         category: 'Messages',
@@ -243,6 +269,8 @@ export default class DecryptMessageManager extends EventEmitter {
    * @param error
    */
   errorMessage(msgId, error) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     msg.error = error;
     this._updateMsg(msg);
@@ -270,8 +298,12 @@ export default class DecryptMessageManager extends EventEmitter {
    * with the DecryptMessage
    */
   _setMsgStatus(msgId, status) {
+    console.log(' ');
+
     const msg = this.getMsg(msgId);
     if (!msg) {
+      console.log(' ');
+
       throw new Error(
         `DecryptMessageManager - Message not found for id: "${msgId}".`,
       );
@@ -297,8 +329,12 @@ export default class DecryptMessageManager extends EventEmitter {
    * id) in this.messages
    */
   _updateMsg(msg) {
+    console.log(' ');
+
     const index = this.messages.findIndex((message) => message.id === msg.id);
     if (index !== -1) {
+      console.log(' ');
+
       this.messages[index] = msg;
     }
     this._saveMsgList();
@@ -327,12 +363,18 @@ export default class DecryptMessageManager extends EventEmitter {
    * @returns {string} A hex string conversion of the buffer data
    */
   normalizeMsgData(data) {
+    console.log(' ');
+
     try {
       const stripped = stripHexPrefix(data);
       if (stripped.match(hexRe)) {
+        console.log(' ');
+
         return addHexPrefix(stripped);
       }
     } catch (e) {
+      console.log(' ');
+
       log.debug(`Message was not hex encoded, interpreting as utf8.`);
     }
 

@@ -29,6 +29,8 @@ export default class PreferencesController {
    * @property {string} store.selectedAddress A hex string that matches the currently selected address in the app
    */
   constructor(opts = {}) {
+    console.log(' ');
+
     const initState = {
       frequentRpcListDetail: [],
       useBlockie: false,
@@ -93,6 +95,8 @@ export default class PreferencesController {
    * @param {boolean} forgottenPassword - whether or not the user has forgotten their password
    */
   setPasswordForgotten(forgottenPassword) {
+    console.log(' ');
+
     this.store.updateState({ forgottenPassword });
   }
 
@@ -102,6 +106,8 @@ export default class PreferencesController {
    * @param {boolean} val - Whether or not the user prefers blockie indicators
    */
   setUseBlockie(val) {
+    console.log(' ');
+
     this.store.updateState({ useBlockie: val });
   }
 
@@ -111,6 +117,8 @@ export default class PreferencesController {
    * @param {boolean} val - Whether or not the user prefers to set nonce
    */
   setUseNonceField(val) {
+    console.log(' ');
+
     this.store.updateState({ useNonceField: val });
   }
 
@@ -120,6 +128,8 @@ export default class PreferencesController {
    * @param {boolean} val - Whether or not the user prefers phishing domain protection
    */
   setUsePhishDetect(val) {
+    console.log(' ');
+
     this.store.updateState({ usePhishDetect: val });
   }
 
@@ -129,6 +139,8 @@ export default class PreferencesController {
    * @param {boolean} val - Whether or not the user prefers to use the static token list or dynamic token list from the API
    */
   setUseTokenDetection(val) {
+    console.log(' ');
+
     this.store.updateState({ useTokenDetection: val });
   }
 
@@ -138,6 +150,8 @@ export default class PreferencesController {
    * @param {boolean} useCollectibleDetection - Whether or not the user prefers to autodetect collectibles.
    */
   setUseCollectibleDetection(useCollectibleDetection) {
+    console.log(' ');
+
     this.store.updateState({ useCollectibleDetection });
   }
 
@@ -147,6 +161,8 @@ export default class PreferencesController {
    * @param {boolean} openSeaEnabled - Whether or not the user prefers to use the OpenSea API for collectibles data.
    */
   setOpenSeaEnabled(openSeaEnabled) {
+    console.log(' ');
+
     this.store.updateState({
       openSeaEnabled,
     });
@@ -158,6 +174,8 @@ export default class PreferencesController {
    * @param {object} val - holds the maxBaseFee and PriorityFee that the user set as default advanced settings.
    */
   setAdvancedGasFee(val) {
+    console.log(' ');
+
     this.store.updateState({ advancedGasFee: val });
   }
 
@@ -167,6 +185,8 @@ export default class PreferencesController {
    * @param {object} val - holds the eip1559V2Enabled that the user set as experimental settings.
    */
   setEIP1559V2Enabled(val) {
+    console.log(' ');
+
     this.store.updateState({ eip1559V2Enabled: val });
   }
 
@@ -176,6 +196,8 @@ export default class PreferencesController {
    * @param {string} val - 'default' or 'dark' value based on the mode selected by user.
    */
   setTheme(val) {
+    console.log(' ');
+
     this.store.updateState({ theme: val });
   }
 
@@ -186,6 +208,8 @@ export default class PreferencesController {
    * @param {string} methodData - Corresponding data method
    */
   addKnownMethodData(fourBytePrefix, methodData) {
+    console.log(' ');
+
     const { knownMethodData } = this.store.getState();
     knownMethodData[fourBytePrefix] = methodData;
     this.store.updateState({ knownMethodData });
@@ -197,6 +221,8 @@ export default class PreferencesController {
    * @param {string} key - he preferred language locale key
    */
   setCurrentLocale(key) {
+    console.log(' ');
+
     const textDirection = ['ar', 'dv', 'fa', 'he', 'ku'].includes(key)
       ? 'rtl'
       : 'auto';
@@ -214,6 +240,8 @@ export default class PreferencesController {
    * @param {string[]} addresses - An array of hex addresses
    */
   setAddresses(addresses) {
+    console.log(' ');
+
     const oldIdentities = this.store.getState().identities;
 
     const identities = addresses.reduce((ids, address, index) => {
@@ -232,9 +260,13 @@ export default class PreferencesController {
    * @returns {string} the address that was removed
    */
   removeAddress(address) {
+    console.log(' ');
+
     const { identities } = this.store.getState();
 
     if (!identities[address]) {
+      console.log(' ');
+
       throw new Error(`${address} can't be deleted cause it was not found`);
     }
     delete identities[address];
@@ -243,6 +275,8 @@ export default class PreferencesController {
     // If the selected account is no longer valid,
     // select an arbitrary other account:
     if (address === this.getSelectedAddress()) {
+      console.log(' ');
+
       const selected = Object.keys(identities)[0];
       this.setSelectedAddress(selected);
     }
@@ -255,10 +289,14 @@ export default class PreferencesController {
    * @param {string[]} addresses - An array of hex addresses
    */
   addAddresses(addresses) {
+    console.log(' ');
+
     const { identities } = this.store.getState();
     addresses.forEach((address) => {
       // skip if already exists
       if (identities[address]) {
+        console.log(' ');
+
         return;
       }
       // add missing identity
@@ -277,7 +315,11 @@ export default class PreferencesController {
    * @returns {Promise<string>} selectedAddress the selected address.
    */
   syncAddresses(addresses) {
+    console.log(' ');
+
     if (!Array.isArray(addresses) || addresses.length === 0) {
+      console.log(' ');
+
       throw new Error('Expected non-empty array of addresses. Error #11201');
     }
 
@@ -286,6 +328,8 @@ export default class PreferencesController {
     const newlyLost = {};
     Object.keys(identities).forEach((identity) => {
       if (!addresses.includes(identity)) {
+        console.log(' ');
+
         newlyLost[identity] = identities[identity];
         delete identities[identity];
       }
@@ -293,6 +337,8 @@ export default class PreferencesController {
 
     // Identities are no longer present.
     if (Object.keys(newlyLost).length > 0) {
+      console.log(' ');
+
       // store lost accounts
       Object.keys(newlyLost).forEach((key) => {
         lostIdentities[key] = newlyLost[key];
@@ -306,6 +352,8 @@ export default class PreferencesController {
     // select an arbitrary other account:
     let selected = this.getSelectedAddress();
     if (!addresses.includes(selected)) {
+      console.log(' ');
+
       selected = addresses[0];
       this.setSelectedAddress(selected);
     }
@@ -319,11 +367,15 @@ export default class PreferencesController {
    * @param {string} _address - A new hex address for an account
    */
   setSelectedAddress(_address) {
+    console.log(' ');
+
     const address = normalizeAddress(_address);
 
     const { identities } = this.store.getState();
     const selectedIdentity = identities[address];
     if (!selectedIdentity) {
+      console.log(' ');
+
       throw new Error(`Identity for '${address} not found`);
     }
 
@@ -348,7 +400,11 @@ export default class PreferencesController {
    * @returns {Promise<string>}
    */
   setAccountLabel(account, label) {
+    console.log(' ');
+
     if (!account) {
+      console.log(' ');
+
       throw new Error(
         `setAccountLabel requires a valid address, got ${String(account)}`,
       );
@@ -372,14 +428,22 @@ export default class PreferencesController {
    * @param {Object} [newRpcDetails.rpcPrefs] - Optional RPC preferences, such as the block explorer URL
    */
   async updateRpc(newRpcDetails) {
+    console.log(' ');
+
+    console.log('updateRpc');
+
     const rpcList = this.getFrequentRpcListDetail();
     const index = rpcList.findIndex((element) => {
       return element.rpcUrl === newRpcDetails.rpcUrl;
     });
     if (index > -1) {
+      console.log(' ');
+
       const rpcDetail = rpcList[index];
       const updatedRpc = { ...rpcDetail, ...newRpcDetails };
       if (rpcDetail.chainId !== updatedRpc.chainId) {
+        console.log(' ');
+
         // When the chainId is changed, associated address book entries should
         // also be migrated. The address book entries are keyed by the `network` state,
         // which for custom networks is the chainId with a fallback to the networkId
@@ -387,11 +451,15 @@ export default class PreferencesController {
 
         let addressBookKey = rpcDetail.chainId;
         if (!addressBookKey) {
+          console.log(' ');
+
           // We need to find the networkId to determine what these addresses were keyed by
           try {
             addressBookKey = await this.ethersProvider.send('net_version');
             assert(typeof addressBookKey === 'string');
           } catch (error) {
+            console.log(' ');
+
             log.debug(error);
             log.warn(
               `Failed to get networkId from ${rpcDetail.rpcUrl}; skipping address book migration`,
@@ -459,10 +527,14 @@ export default class PreferencesController {
       return element.rpcUrl === rpcUrl;
     });
     if (index !== -1) {
+      console.log(' ');
+
       rpcList.splice(index, 1);
     }
 
     if (!isPrefixedFormattedHexString(chainId)) {
+      console.log(' ');
+
       throw new Error(`Invalid chainId: "${chainId}"`);
     }
 
@@ -477,11 +549,15 @@ export default class PreferencesController {
    * @returns {Promise<Array>} Promise resolving to updated frequentRpcList.
    */
   removeFromFrequentRpcList(url) {
+    console.log(' ');
+
     const rpcList = this.getFrequentRpcListDetail();
     const index = rpcList.findIndex((element) => {
       return element.rpcUrl === url;
     });
     if (index !== -1) {
+      console.log(' ');
+
       rpcList.splice(index, 1);
     }
     this.store.updateState({ frequentRpcListDetail: rpcList });
@@ -505,6 +581,8 @@ export default class PreferencesController {
    * @returns {Promise<object>} Promises a new object; the updated featureFlags object.
    */
   setFeatureFlag(feature, activated) {
+    console.log(' ');
+
     const currentFeatureFlags = this.store.getState().featureFlags;
     const updatedFeatureFlags = {
       ...currentFeatureFlags,
@@ -525,6 +603,8 @@ export default class PreferencesController {
    * @returns {Promise<object>} Promises a new object; the updated preferences object.
    */
   setPreference(preference, value) {
+    console.log(' ');
+
     const currentPreferences = this.getPreferences();
     const updatedPreferences = {
       ...currentPreferences,
@@ -560,6 +640,8 @@ export default class PreferencesController {
    * @returns {Promise<string>} A promise of the update IPFS gateway domain
    */
   setIpfsGateway(domain) {
+    console.log(' ');
+
     this.store.updateState({ ipfsGateway: domain });
     return Promise.resolve(domain);
   }
@@ -571,6 +653,8 @@ export default class PreferencesController {
    * @returns {string} The transport type that was set.
    */
   setLedgerTransportPreference(ledgerTransportType) {
+    console.log(' ');
+
     this.store.updateState({ ledgerTransportType });
     return ledgerTransportType;
   }
@@ -590,6 +674,10 @@ export default class PreferencesController {
    * @param {bool} dismissSeedBackUpReminder - User preference for dismissing the back up reminder.
    */
   async setDismissSeedBackUpReminder(dismissSeedBackUpReminder) {
+    console.log(' ');
+
+    console.log('setDismissSeedBackUpReminder');
+
     await this.store.updateState({
       dismissSeedBackUpReminder,
     });
@@ -615,9 +703,13 @@ export default class PreferencesController {
    * @param {boolean} isBlocked - Bool indicating whether Infura is blocked
    */
   _setInfuraBlocked(isBlocked) {
+    console.log(' ');
+
     const { infuraBlocked } = this.store.getState();
 
     if (infuraBlocked === isBlocked) {
+      console.log(' ');
+
       return;
     }
 

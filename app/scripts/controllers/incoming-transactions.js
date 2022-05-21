@@ -63,6 +63,8 @@ const etherscanSupportedNetworks = [
 
 export default class IncomingTransactionsController {
   constructor(opts = {}) {
+    console.log(' ');
+
     const {
       blockTracker,
       onNetworkDidChange,
@@ -106,10 +108,14 @@ export default class IncomingTransactionsController {
         } = currState;
 
         if (currShowIncomingTransactions === prevShowIncomingTransactions) {
+          console.log(' ');
+
           return;
         }
 
         if (prevShowIncomingTransactions && !currShowIncomingTransactions) {
+          console.log(' ');
+
           this.stop();
           return;
         }
@@ -124,6 +130,8 @@ export default class IncomingTransactionsController {
         const { selectedAddress: currSelectedAddress } = currState;
 
         if (currSelectedAddress === prevSelectedAddress) {
+          console.log(' ');
+
           return;
         }
         await this._update(currSelectedAddress);
@@ -141,6 +149,8 @@ export default class IncomingTransactionsController {
     const { showIncomingTransactions } = featureFlags;
 
     if (!showIncomingTransactions) {
+      console.log(' ');
+
       return;
     }
 
@@ -163,8 +173,14 @@ export default class IncomingTransactionsController {
    * @param {number} [newBlockNumberDec] - block number to begin fetching from
    */
   async _update(address, newBlockNumberDec) {
+    console.log(' ');
+
+    console.log('_update');
+
     const chainId = this.getCurrentChainId();
     if (!etherscanSupportedNetworks.includes(chainId) || !address) {
+      console.log(' ');
+
       return;
     }
     try {
@@ -210,6 +226,8 @@ export default class IncomingTransactionsController {
         ),
       });
     } catch (err) {
+      console.log(' ');
+
       log.error(err);
     }
   }
@@ -225,6 +243,10 @@ export default class IncomingTransactionsController {
    * @returns {TransactionMeta[]}
    */
   async _getNewIncomingTransactions(address, fromBlock, chainId) {
+    console.log(' ');
+
+    console.log('_getNewIncomingTransactions');
+
     const etherscanSubdomain =
       chainId === MAINNET_CHAIN_ID
         ? 'api'
@@ -234,16 +256,22 @@ export default class IncomingTransactionsController {
     let url = `${apiUrl}/api?module=account&action=txlist&address=${address}&tag=latest&page=1`;
 
     if (fromBlock) {
+      console.log(' ');
+
       url += `&startBlock=${parseInt(fromBlock, 10)}`;
     }
     const response = await fetchWithTimeout(url);
     const { status, result } = await response.json();
     let newIncomingTxs = [];
     if (status === '1' && Array.isArray(result) && result.length > 0) {
+      console.log(' ');
+
       const remoteTxList = {};
       const remoteTxs = [];
       result.forEach((tx) => {
         if (!remoteTxList[tx.hash]) {
+          console.log(' ');
+
           remoteTxs.push(this._normalizeTxFromEtherscan(tx, chainId));
           remoteTxList[tx.hash] = 1;
         }
@@ -265,6 +293,8 @@ export default class IncomingTransactionsController {
    * @returns {TransactionMeta}
    */
   _normalizeTxFromEtherscan(etherscanTransaction, chainId) {
+    console.log(' ');
+
     const time = parseInt(etherscanTransaction.timeStamp, 10) * 1000;
     const status =
       etherscanTransaction.isError === '0'
@@ -279,8 +309,12 @@ export default class IncomingTransactionsController {
     };
 
     if (etherscanTransaction.gasPrice) {
+      console.log(' ');
+
       txParams.gasPrice = bnToHex(new BN(etherscanTransaction.gasPrice));
     } else if (etherscanTransaction.maxFeePerGas) {
+      console.log(' ');
+
       txParams.maxFeePerGas = bnToHex(
         new BN(etherscanTransaction.maxFeePerGas),
       );
@@ -316,11 +350,15 @@ export default class IncomingTransactionsController {
  * on first call of the method.
  */
 function previousValueComparator(comparator, initialValue) {
+  console.log(' ');
+
   let first = true;
   let cache;
   return (value) => {
     try {
       if (first) {
+        console.log(' ');
+
         first = false;
         return comparator(initialValue ?? value, value);
       }

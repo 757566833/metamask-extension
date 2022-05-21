@@ -23,9 +23,13 @@ export const buildSnapEndowmentSpecifications = () =>
  * restricted method implementations.
  */
 export function buildSnapRestrictedMethodSpecifications(hooks) {
+  console.log(' ');
+
   return Object.values(restrictedMethodPermissionBuilders).reduce(
     (specifications, { targetKey, specificationBuilder, methodHooks }) => {
       if (!ExcludedSnapPermissions.has(targetKey)) {
+        console.log(' ');
+
         specifications[targetKey] = specificationBuilder({
           methodHooks: selectHooks(hooks, methodHooks),
         });

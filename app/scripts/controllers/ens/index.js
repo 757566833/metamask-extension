@@ -10,15 +10,21 @@ const ZERO_X_ERROR_ADDRESS = '0x';
 
 export default class EnsController {
   constructor({ ens, provider, onNetworkDidChange, getCurrentChainId } = {}) {
+    console.log(' ');
+
     const initState = {
       ensResolutionsByAddress: {},
     };
 
     this._ens = ens;
     if (!this._ens) {
+      console.log(' ');
+
       const chainId = getCurrentChainId();
       const network = CHAIN_ID_TO_NETWORK_ID_MAP[chainId];
       if (Ens.getNetworkEnsSupport(network)) {
+        console.log(' ');
+
         this._ens = new Ens({
           network,
           provider,
@@ -32,6 +38,8 @@ export default class EnsController {
       const chainId = getCurrentChainId();
       const network = CHAIN_ID_TO_NETWORK_ID_MAP[chainId];
       if (Ens.getNetworkEnsSupport(network)) {
+        console.log(' ');
+
         this._ens = new Ens({
           network,
           provider,
@@ -43,16 +51,26 @@ export default class EnsController {
   }
 
   reverseResolveAddress(address) {
+    console.log(' ');
+
     return this._reverseResolveAddress(toChecksumHexAddress(address));
   }
 
   async _reverseResolveAddress(address) {
+    console.log(' ');
+
+    console.log('_reverseResolveAddress');
+
     if (!this._ens) {
+      console.log(' ');
+
       return undefined;
     }
 
     const state = this.store.getState();
     if (state.ensResolutionsByAddress[address]) {
+      console.log(' ');
+
       return state.ensResolutionsByAddress[address];
     }
 
@@ -60,6 +78,8 @@ export default class EnsController {
     try {
       domain = await this._ens.reverse(address);
     } catch (error) {
+      console.log(' ');
+
       log.debug(error);
       return undefined;
     }
@@ -68,6 +88,8 @@ export default class EnsController {
     try {
       registeredAddress = await this._ens.lookup(domain);
     } catch (error) {
+      console.log(' ');
+
       log.debug(error);
       return undefined;
     }
@@ -80,6 +102,8 @@ export default class EnsController {
     }
 
     if (toChecksumHexAddress(registeredAddress) !== address) {
+      console.log(' ');
+
       return undefined;
     }
 
@@ -88,6 +112,8 @@ export default class EnsController {
   }
 
   _updateResolutionsByAddress(address, domain) {
+    console.log(' ');
+
     const oldState = this.store.getState();
     this.store.putState({
       ensResolutionsByAddress: {

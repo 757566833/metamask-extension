@@ -24,6 +24,8 @@ import { hexToBn, BnMultiplyByFraction, bnToHex } from '../../lib/util';
 
 export default class TxGasUtil {
   constructor(provider) {
+    console.log(' ');
+
     this.query = new EthQuery(provider);
   }
 
@@ -32,6 +34,10 @@ export default class TxGasUtil {
    * @returns {GasAnalysisResult} The result of the gas analysis
    */
   async analyzeGasUsage(txMeta) {
+    console.log(' ');
+
+    console.log('analyzeGasUsage');
+
     const block = await this.query.getBlockByNumber('latest', false);
 
     // fallback to block gasLimit
@@ -42,6 +48,8 @@ export default class TxGasUtil {
     try {
       estimatedGasHex = await this.estimateTxGas(txMeta);
     } catch (error) {
+      console.log(' ');
+
       log.warn(error);
       simulationFails = {
         reason: error.message,
@@ -60,6 +68,10 @@ export default class TxGasUtil {
    * @returns {string} the estimated gas limit as a hex string
    */
   async estimateTxGas(txMeta) {
+    console.log(' ');
+
+    console.log('estimateTxGas');
+
     const txParams = cloneDeep(txMeta.txParams);
 
     // `eth_estimateGas` can fail if the user has insufficient balance for the
@@ -84,6 +96,8 @@ export default class TxGasUtil {
    * @returns {string} the buffered gas limit as a hex string
    */
   addGasBuffer(initialGasLimitHex, blockGasLimitHex, multiplier = 1.5) {
+    console.log(' ');
+
     const initialGasLimitBn = hexToBn(initialGasLimitHex);
     const blockGasLimitBn = hexToBn(blockGasLimitHex);
     const upperGasLimitBn = blockGasLimitBn.muln(0.9);
@@ -91,10 +105,14 @@ export default class TxGasUtil {
 
     // if initialGasLimit is above blockGasLimit, dont modify it
     if (initialGasLimitBn.gt(upperGasLimitBn)) {
+      console.log(' ');
+
       return bnToHex(initialGasLimitBn);
     }
     // if bufferedGasLimit is below blockGasLimit, use bufferedGasLimit
     if (bufferedGasLimitBn.lt(upperGasLimitBn)) {
+      console.log(' ');
+
       return bnToHex(bufferedGasLimitBn);
     }
     // otherwise use blockGasLimit
@@ -102,6 +120,10 @@ export default class TxGasUtil {
   }
 
   async getBufferedGasLimit(txMeta, multiplier) {
+    console.log(' ');
+
+    console.log('getBufferedGasLimit');
+
     const {
       blockGasLimit,
       estimatedGasHex,

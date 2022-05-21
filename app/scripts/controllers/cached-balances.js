@@ -18,6 +18,8 @@ export default class CachedBalancesController {
    * @param {CachedBalancesOptions} [opts] - Controller configuration parameters
    */
   constructor(opts = {}) {
+    console.log(' ');
+
     const { accountTracker, getCurrentChainId } = opts;
 
     this.accountTracker = accountTracker;
@@ -38,6 +40,10 @@ export default class CachedBalancesController {
    * @returns {Promise<void>}
    */
   async updateCachedBalances({ accounts }) {
+    console.log(' ');
+
+    console.log('updateCachedBalances');
+
     const chainId = this.getCurrentChainId();
     const balancesToCache = await this._generateBalancesToCache(
       accounts,
@@ -49,6 +55,9 @@ export default class CachedBalancesController {
   }
 
   _generateBalancesToCache(newAccounts, chainId) {
+    console.log(' ');
+
+    console.log(' ');
     const { cachedBalances } = this.store.getState();
     const currentChainBalancesToCache = { ...cachedBalances[chainId] };
 
@@ -56,6 +65,8 @@ export default class CachedBalancesController {
       const account = newAccounts[accountID];
 
       if (account.balance) {
+        console.log(' ');
+
         currentChainBalancesToCache[accountID] = account.balance;
       }
     });

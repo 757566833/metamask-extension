@@ -26,7 +26,11 @@ const switchEthereumChain = {
 export default switchEthereumChain;
 
 function findExistingNetwork(chainId, findCustomRpcBy) {
+  console.log(' ');
+
   if (chainId in CHAIN_ID_TO_TYPE_MAP) {
+    console.log(' ');
+
     return {
       chainId,
       ticker: ETH_SYMBOL,
@@ -53,6 +57,8 @@ async function switchEthereumChainHandler(
   },
 ) {
   if (!req.params?.[0] || typeof req.params[0] !== 'object') {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Expected single, object parameter. Received:\n${JSON.stringify(
@@ -69,6 +75,8 @@ async function switchEthereumChainHandler(
   const otherKeys = Object.keys(omit(req.params[0], ['chainId']));
 
   if (otherKeys.length > 0) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Received unexpected keys on object parameter. Unsupported keys:\n${otherKeys}`,
@@ -79,6 +87,8 @@ async function switchEthereumChainHandler(
   const _chainId = typeof chainId === 'string' && chainId.toLowerCase();
 
   if (!isPrefixedFormattedHexString(_chainId)) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Expected 0x-prefixed, unpadded, non-zero hexadecimal string 'chainId'. Received:\n${chainId}`,
@@ -87,6 +97,8 @@ async function switchEthereumChainHandler(
   }
 
   if (!isSafeChainId(parseInt(_chainId, 16))) {
+    console.log(' ');
+
     return end(
       ethErrors.rpc.invalidParams({
         message: `Invalid chain ID "${_chainId}": numerical value greater than max safe value. Received:\n${chainId}`,
@@ -96,8 +108,12 @@ async function switchEthereumChainHandler(
 
   const requestData = findExistingNetwork(_chainId, findCustomRpcBy);
   if (requestData) {
+    console.log(' ');
+
     const currentChainId = getCurrentChainId();
     if (currentChainId === _chainId) {
+      console.log(' ');
+
       res.result = null;
       return end();
     }
@@ -108,12 +124,16 @@ async function switchEthereumChainHandler(
         requestData,
       });
       if (chainId in CHAIN_ID_TO_TYPE_MAP) {
+        console.log(' ');
+
         setProviderType(approvedRequestData.type);
       } else {
         await updateRpcTarget(approvedRequestData);
       }
       res.result = null;
     } catch (error) {
+      console.log(' ');
+
       return end(error);
     }
     return end();

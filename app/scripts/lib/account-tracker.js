@@ -53,6 +53,8 @@ export default class AccountTracker {
    * @param {Function} opts.getCurrentChainId - A function that returns the `chainId` for the current global network
    */
   constructor(opts = {}) {
+    console.log(' ');
+
     const initState = {
       accounts: {},
       currentBlockGasLimit: '',
@@ -99,12 +101,16 @@ export default class AccountTracker {
    * in sync
    */
   syncWithAddresses(addresses) {
+    console.log(' ');
+
     const { accounts } = this.store.getState();
     const locals = Object.keys(accounts);
 
     const accountsToAdd = [];
     addresses.forEach((upstream) => {
       if (!locals.includes(upstream)) {
+        console.log(' ');
+
         accountsToAdd.push(upstream);
       }
     });
@@ -112,6 +118,8 @@ export default class AccountTracker {
     const accountsToRemove = [];
     locals.forEach((local) => {
       if (!addresses.includes(local)) {
+        console.log(' ');
+
         accountsToRemove.push(local);
       }
     });
@@ -127,6 +135,8 @@ export default class AccountTracker {
    * @param {Array} addresses - An array of hex addresses of new accounts to track
    */
   addAccounts(addresses) {
+    console.log(' ');
+
     const { accounts } = this.store.getState();
     // add initial state for addresses
     addresses.forEach((address) => {
@@ -136,6 +146,8 @@ export default class AccountTracker {
     this.store.updateState({ accounts });
     // fetch balances for the accounts if there is block number ready
     if (!this._currentBlockNumber) {
+      console.log(' ');
+
       return;
     }
     this._updateAccounts();
@@ -147,6 +159,8 @@ export default class AccountTracker {
    * @param {Array} addresses - An array of hex addresses to stop tracking.
    */
   removeAccount(addresses) {
+    console.log(' ');
+
     const { accounts } = this.store.getState();
     // remove each state object
     addresses.forEach((address) => {
@@ -173,11 +187,17 @@ export default class AccountTracker {
    * @fires 'block' The updated state, if all account updates are successful
    */
   async _updateForBlock(blockNumber) {
+    console.log(' ');
+
+    console.log('_updateForBlock');
+
     this._currentBlockNumber = blockNumber;
 
     // block gasLimit polling shouldn't be in account-tracker shouldn't be here...
     const currentBlock = await this._query.getBlockByNumber(blockNumber, false);
     if (!currentBlock) {
+      console.log(' ');
+
       return;
     }
     const currentBlockGasLimit = currentBlock.gasLimit;
@@ -186,6 +206,8 @@ export default class AccountTracker {
     try {
       await this._updateAccounts();
     } catch (err) {
+      console.log(' ');
+
       log.error(err);
     }
   }
@@ -197,6 +219,8 @@ export default class AccountTracker {
    * @returns {Promise} after all account balances updated
    */
   async _updateAccounts() {
+    console.log('_updateAccounts');
+
     const { accounts } = this.store.getState();
     const addresses = Object.keys(accounts);
     const chainId = this.getCurrentChainId();
@@ -243,6 +267,10 @@ export default class AccountTracker {
    * @returns {Promise} after the account balance is updated
    */
   async _updateAccount(address) {
+    console.log(' ');
+
+    console.log('_updateAccount');
+
     // query balance
     const balance = await this._query.getBalance(address);
     const result = { address, balance };
@@ -250,6 +278,8 @@ export default class AccountTracker {
     const { accounts } = this.store.getState();
     // only populate if the entry is still present
     if (!accounts[address]) {
+      console.log(' ');
+
       return;
     }
     accounts[address] = result;
@@ -263,6 +293,10 @@ export default class AccountTracker {
    * @param {*} deployedContractAddress
    */
   async _updateAccountsViaBalanceChecker(addresses, deployedContractAddress) {
+    console.log(' ');
+
+    console.log('_updateAccountsViaBalanceChecker');
+
     const { accounts } = this.store.getState();
     this.web3.setProvider(this._provider);
     const ethContract = this.web3.eth
@@ -272,6 +306,8 @@ export default class AccountTracker {
 
     ethContract.balances(addresses, ethBalance, (error, result) => {
       if (error) {
+        console.log(' ');
+
         log.warn(
           `MetaMask - Account Tracker single call balance fetch failed`,
           error,

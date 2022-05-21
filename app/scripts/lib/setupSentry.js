@@ -68,9 +68,15 @@ export const SENTRY_STATE = {
 };
 
 export default function setupSentry({ release, getState }) {
+  console.log(' ');
+
   if (!release) {
+    console.log(' ');
+
     throw new Error('Missing release');
   } else if (METAMASK_DEBUG) {
+    console.log(' ');
+
     return undefined;
   }
 
@@ -81,7 +87,11 @@ export default function setupSentry({ release, getState }) {
 
   let sentryTarget;
   if (METAMASK_ENVIRONMENT === 'production') {
+    console.log(' ');
+
     if (!process.env.SENTRY_DSN) {
+      console.log(' ');
+
       throw new Error(
         `Missing SENTRY_DSN environment variable in production environment`,
       );
@@ -107,6 +117,8 @@ export default function setupSentry({ release, getState }) {
   });
 
   function rewriteReport(report) {
+    console.log(' ');
+
     try {
       // simplify certain complex error messages (e.g. Ethjs)
       simplifyErrorMessages(report);
@@ -114,13 +126,19 @@ export default function setupSentry({ release, getState }) {
       rewriteReportUrls(report);
       // append app state
       if (getState) {
+        console.log(' ');
+
         const appState = getState();
         if (!report.extra) {
+          console.log(' ');
+
           report.extra = {};
         }
         report.extra.appState = appState;
       }
     } catch (err) {
+      console.log(' ');
+
       console.warn(err);
     }
     return report;
@@ -130,6 +148,8 @@ export default function setupSentry({ release, getState }) {
 }
 
 function simplifyErrorMessages(report) {
+  console.log(' ');
+
   rewriteErrorMessages(report, (errorMessage) => {
     // simplify ethjs error messages
     let simplifiedErrorMessage = extractEthjsErrorMessage(errorMessage);
@@ -147,14 +167,22 @@ function simplifyErrorMessages(report) {
 }
 
 function rewriteErrorMessages(report, rewriteFn) {
+  console.log(' ');
+
   // rewrite top level message
   if (typeof report.message === 'string') {
+    console.log(' ');
+
     report.message = rewriteFn(report.message);
   }
   // rewrite each exception message
   if (report.exception && report.exception.values) {
+    console.log(' ');
+
     report.exception.values.forEach((item) => {
       if (typeof item.value === 'string') {
+        console.log(' ');
+
         item.value = rewriteFn(item.value);
       }
     });
@@ -162,12 +190,18 @@ function rewriteErrorMessages(report, rewriteFn) {
 }
 
 function rewriteReportUrls(report) {
+  console.log(' ');
+
   // update request url
   report.request.url = toMetamaskUrl(report.request.url);
   // update exception stack trace
   if (report.exception && report.exception.values) {
+    console.log(' ');
+
     report.exception.values.forEach((item) => {
       if (item.stacktrace) {
+        console.log(' ');
+
         item.stacktrace.frames.forEach((frame) => {
           frame.filename = toMetamaskUrl(frame.filename);
         });
@@ -177,8 +211,12 @@ function rewriteReportUrls(report) {
 }
 
 function toMetamaskUrl(origUrl) {
+  console.log(' ');
+
   const filePath = origUrl.split(window.location.origin)[1];
   if (!filePath) {
+    console.log(' ');
+
     return origUrl;
   }
   const metamaskUrl = `metamask${filePath}`;

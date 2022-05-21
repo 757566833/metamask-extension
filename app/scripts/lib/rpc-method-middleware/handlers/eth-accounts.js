@@ -28,6 +28,10 @@ export default requestEthereumAccounts;
  * @param {EthAccountsOptions} options - The RPC method hooks.
  */
 async function ethAccountsHandler(_req, res, _next, end, { getAccounts }) {
+  console.log(' ');
+
+  console.log('function ethAccountsHandler');
+
   console.log('ethAccountsHandler');
 
   res.result = await getAccounts();

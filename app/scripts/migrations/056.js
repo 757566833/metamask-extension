@@ -10,12 +10,18 @@ const version = 56;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
 
     const { PreferencesController } = versionedData.data;
 
     if (Array.isArray(PreferencesController?.tokens)) {
+      console.log(' ');
+
       PreferencesController.tokens = PreferencesController.tokens.filter(
         ({ address }) => address,
       );

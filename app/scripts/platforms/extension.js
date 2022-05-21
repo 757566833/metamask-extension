@@ -14,10 +14,14 @@ export default class ExtensionPlatform {
   }
 
   openTab(options) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       browser.tabs.create(options).then((newTab) => {
         const error = checkForError();
         if (error) {
+          console.log(' ');
+
           return reject(error);
         }
         return resolve(newTab);
@@ -26,10 +30,14 @@ export default class ExtensionPlatform {
   }
 
   openWindow(options) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       browser.windows.create(options).then((newWindow) => {
         const error = checkForError();
         if (error) {
+          console.log(' ');
+
           return reject(error);
         }
         return resolve(newWindow);
@@ -38,10 +46,14 @@ export default class ExtensionPlatform {
   }
 
   focusWindow(windowId) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       browser.windows.update(windowId, { focused: true }).then(() => {
         const error = checkForError();
         if (error) {
+          console.log(' ');
+
           return reject(error);
         }
         return resolve();
@@ -50,10 +62,14 @@ export default class ExtensionPlatform {
   }
 
   updateWindowPosition(windowId, left, top) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       browser.windows.update(windowId, { left, top }).then(() => {
         const error = checkForError();
         if (error) {
+          console.log(' ');
+
           return reject(error);
         }
         return resolve();
@@ -66,6 +82,8 @@ export default class ExtensionPlatform {
       browser.windows.getLastFocused().then((windowObject) => {
         const error = checkForError();
         if (error) {
+          console.log(' ');
+
           return reject(error);
         }
         return resolve(windowObject);
@@ -87,19 +105,29 @@ export default class ExtensionPlatform {
 
     const versionParts = version.split('.');
     if (versionName) {
+      console.log(' ');
+
       if (versionParts.length < 4) {
+        console.log(' ');
+
         throw new Error(`Version missing build number: '${version}'`);
       }
       // On Chrome, a more descriptive representation of the version is stored
       // in the `version_name` field for display purposes.
       return versionName;
     } else if (versionParts.length !== 3) {
+      console.log(' ');
+
       throw new Error(`Invalid version: ${version}`);
     } else if (versionParts[2].match(/[^\d]/u)) {
+      console.log(' ');
+
       // On Firefox, the build type and build version are in the fourth part of the version.
       const [major, minor, patchAndPrerelease] = versionParts;
       const matches = patchAndPrerelease.match(/^(\d+)([A-Za-z]+)(\d)+$/u);
       if (matches === null) {
+        console.log(' ');
+
         throw new Error(`Version contains invalid prerelease: ${version}`);
       }
       const [, patch, buildType, buildVersion] = matches;
@@ -119,10 +147,14 @@ export default class ExtensionPlatform {
     let extensionURL = browser.runtime.getURL('home.html');
 
     if (route) {
+      console.log(' ');
+
       extensionURL += `#${route}`;
     }
 
     if (queryString) {
+      console.log(' ');
+
       extensionURL += `?${queryString}`;
     }
 
@@ -136,11 +168,15 @@ export default class ExtensionPlatform {
   }
 
   getPlatformInfo(cb) {
+    console.log(' ');
+
     try {
       const platformInfo = browser.runtime.getPlatformInfo();
       cb(platformInfo);
       return;
     } catch (e) {
+      console.log(' ');
+
       cb(e);
       // eslint-disable-next-line no-useless-return
       return;
@@ -148,9 +184,13 @@ export default class ExtensionPlatform {
   }
 
   showTransactionNotification(txMeta, rpcPrefs) {
+    console.log(' ');
+
     const { status, txReceipt: { status: receiptStatus } = {} } = txMeta;
 
     if (status === TRANSACTION_STATUSES.CONFIRMED) {
+      console.log(' ');
+
       // There was an on-chain failure
       receiptStatus === '0x0'
         ? this._showFailedTransaction(
@@ -159,11 +199,15 @@ export default class ExtensionPlatform {
           )
         : this._showConfirmedTransaction(txMeta, rpcPrefs);
     } else if (status === TRANSACTION_STATUSES.FAILED) {
+      console.log(' ');
+
       this._showFailedTransaction(txMeta);
     }
   }
 
   addOnRemovedListener(listener) {
+    console.log(' ');
+
     browser.windows.onRemoved.addListener(listener);
   }
 
@@ -172,6 +216,8 @@ export default class ExtensionPlatform {
       browser.windows.getAll().then((windows) => {
         const error = checkForError();
         if (error) {
+          console.log(' ');
+
           return reject(error);
         }
         return resolve(windows);
@@ -184,6 +230,8 @@ export default class ExtensionPlatform {
       browser.tabs.query({ active: true }).then((tabs) => {
         const error = checkForError();
         if (error) {
+          console.log(' ');
+
           return reject(error);
         }
         return resolve(tabs);
@@ -196,6 +244,8 @@ export default class ExtensionPlatform {
       browser.tabs.getCurrent().then((tab) => {
         const err = checkForError();
         if (err) {
+          console.log(' ');
+
           reject(err);
         } else {
           resolve(tab);
@@ -205,10 +255,14 @@ export default class ExtensionPlatform {
   }
 
   switchToTab(tabId) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       browser.tabs.update(tabId, { highlighted: true }).then((tab) => {
         const err = checkForError();
         if (err) {
+          console.log(' ');
+
           reject(err);
         } else {
           resolve(tab);
@@ -218,10 +272,14 @@ export default class ExtensionPlatform {
   }
 
   closeTab(tabId) {
+    console.log(' ');
+
     return new Promise((resolve, reject) => {
       browser.tabs.remove(tabId).then(() => {
         const err = checkForError();
         if (err) {
+          console.log(' ');
+
           reject(err);
         } else {
           resolve();
@@ -231,6 +289,8 @@ export default class ExtensionPlatform {
   }
 
   _showConfirmedTransaction(txMeta, rpcPrefs) {
+    console.log(' ');
+
     this._subscribeToNotificationClicked();
 
     const url = getBlockExplorerLink(txMeta, rpcPrefs);
@@ -244,6 +304,8 @@ export default class ExtensionPlatform {
   }
 
   _showFailedTransaction(txMeta, errorMessage) {
+    console.log(' ');
+
     const nonce = parseInt(txMeta.txParams.nonce, 16);
     const title = 'Failed transaction';
     const message = `Transaction ${nonce} failed! ${
@@ -253,6 +315,8 @@ export default class ExtensionPlatform {
   }
 
   _showNotification(title, message, url) {
+    console.log(' ');
+
     browser.notifications.create(url, {
       type: 'basic',
       title,
@@ -263,12 +327,18 @@ export default class ExtensionPlatform {
 
   _subscribeToNotificationClicked() {
     if (!browser.notifications.onClicked.hasListener(this._viewOnEtherscan)) {
+      console.log(' ');
+
       browser.notifications.onClicked.addListener(this._viewOnEtherscan);
     }
   }
 
   _viewOnEtherscan(url) {
+    console.log(' ');
+
     if (url.startsWith('https://')) {
+      console.log(' ');
+
       browser.tabs.create({ url });
     }
   }

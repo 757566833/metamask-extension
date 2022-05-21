@@ -35,10 +35,14 @@ const createWyrePurchaseUrl = async (address) => {
     });
     const parsedResponse = await response.json();
     if (response.ok && parsedResponse.url) {
+      console.log(' ');
+
       return parsedResponse.url;
     }
     log.warn('Failed to create a Wyre purchase URL', parsedResponse);
   } catch (err) {
+    console.log(' ');
+
     log.warn('Failed to create a Wyre purchase URL', err);
   }
   return wyrePurchaseUrlFallback; // In case the API call would fail, we return a fallback URL for Wyre's Checkout.
@@ -99,10 +103,14 @@ const createMoonPayUrl = async (walletAddress, chainId) => {
     });
     const parsedResponse = await response.json();
     if (response.ok && parsedResponse.url) {
+      console.log(' ');
+
       return parsedResponse.url;
     }
     log.warn('Failed to create a MoonPay purchase URL', parsedResponse);
   } catch (err) {
+    console.log(' ');
+
     log.warn('Failed to create a MoonPay purchase URL', err);
   }
   return '';
@@ -119,10 +127,16 @@ const createMoonPayUrl = async (walletAddress, chainId) => {
  * chainId does not match any of the specified cases, or if no chainId is given, returns undefined.
  */
 export default async function getBuyUrl({ chainId, address, service }) {
+  console.log(' ');
+
+  console.log('function getBuyUrl');
+
   console.log('getBuyUrl');
 
   // default service by network if not specified
   if (!service) {
+    console.log(' ');
+
     // eslint-disable-next-line no-param-reassign
     service = getDefaultServiceForChain(chainId);
   }
@@ -150,6 +164,8 @@ export default async function getBuyUrl({ chainId, address, service }) {
 }
 
 function getDefaultServiceForChain(chainId) {
+  console.log(' ');
+
   switch (chainId) {
     case MAINNET_CHAIN_ID:
       return 'wyre';

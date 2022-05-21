@@ -31,12 +31,18 @@ export default function setupEnsIpfsResolver({
   };
 
   async function webRequestDidFail(details) {
+    console.log(' ');
+
+    console.log('function webRequestDidFail');
+
     console.log('webRequestDidFail');
 
     const { tabId, url } = details;
     // ignore requests that are not associated with tabs
     // only attempt ENS resolution on mainnet
     if (tabId === -1 || getCurrentChainId() !== '0x1') {
+      console.log(' ');
+
       return;
     }
     // parse ens name
@@ -45,6 +51,8 @@ export default function setupEnsIpfsResolver({
     const topLevelDomain = domainParts[domainParts.length - 1];
     // if unsupported TLD, abort
     if (!supportedTopLevelDomains.includes(topLevelDomain)) {
+      console.log(' ');
+
       return;
     }
     // otherwise attempt resolve
@@ -52,6 +60,10 @@ export default function setupEnsIpfsResolver({
   }
 
   async function attemptResolve({ tabId, name, pathname, search, fragment }) {
+    console.log(' ');
+
+    console.log('function attemptResolve');
+
     console.log('attemptResolve');
 
     const ipfsGateway = getIpfsGateway();
@@ -64,6 +76,8 @@ export default function setupEnsIpfsResolver({
         name,
       });
       if (type === 'ipfs-ns' || type === 'ipns-ns') {
+        console.log(' ');
+
         const resolvedUrl = `https://${hash}.${type.slice(
           0,
           4,
@@ -74,22 +88,34 @@ export default function setupEnsIpfsResolver({
             method: 'HEAD',
           });
           if (response.status === 200) {
+            console.log(' ');
+
             url = resolvedUrl;
           }
         } catch (err) {
+          console.log(' ');
+
           console.warn(err);
         }
       } else if (type === 'swarm-ns') {
+        console.log(' ');
+
         url = `https://swarm-gateways.net/bzz:/${hash}${pathname}${
           search || ''
         }${fragment || ''}`;
       } else if (type === 'onion' || type === 'onion3') {
+        console.log(' ');
+
         url = `http://${hash}.onion${pathname}${search || ''}${fragment || ''}`;
       } else if (type === 'zeronet') {
+        console.log(' ');
+
         url = `http://127.0.0.1:43110/${hash}${pathname}${search || ''}${
           fragment || ''
         }`;
       } else if (type === 'skynet-ns') {
+        console.log(' ');
+
         const padded = hash.padEnd(hash.length + 4 - (hash.length % 4), '=');
         const decoded = base64.toByteArray(padded);
 
@@ -104,6 +130,8 @@ export default function setupEnsIpfsResolver({
         }${fragment || ''}`;
       }
     } catch (err) {
+      console.log(' ');
+
       console.warn(err);
     } finally {
       browser.tabs.update(tabId, { url });

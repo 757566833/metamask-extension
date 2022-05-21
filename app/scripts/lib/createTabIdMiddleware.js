@@ -5,6 +5,8 @@
  * @returns {Function}
  */
 export default function createTabIdMiddleware(opts) {
+  console.log(' ');
+
   return function tabIdMiddleware(
     /** @type {any} */ req,
     /** @type {any} */ _,

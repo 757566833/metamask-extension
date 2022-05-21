@@ -8,6 +8,10 @@ const version = 32;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -17,9 +21,13 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   const { PreferencesController } = state;
 
   if (PreferencesController) {
+    console.log(' ');
+
     const { betaUI } = PreferencesController.featureFlags || {};
     // Users who have been using the "beta" UI are considered to have completed the migration
     // as they'll see no difference in this version

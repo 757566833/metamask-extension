@@ -108,6 +108,8 @@ const METRICS_STATUS_FAILED = 'failed on-chain';
 
 export default class TransactionController extends EventEmitter {
   constructor(opts) {
+    console.log(' ');
+
     super();
     this.networkStore = opts.networkStore || new ObservableStore({});
     this._getCurrentChainId = opts.getCurrentChainId;
@@ -206,12 +208,18 @@ export default class TransactionController extends EventEmitter {
     const chainId = this._getCurrentChainId();
     const integerChainId = parseInt(chainId, 16);
     if (networkState === 'loading' || Number.isNaN(integerChainId)) {
+      console.log(' ');
+
       return 0;
     }
     return integerChainId;
   }
 
   async getEIP1559Compatibility(fromAddress) {
+    console.log(' ');
+
+    console.log('getEIP1559Compatibility');
+
     const currentNetworkIsCompatible = await this._getCurrentNetworkEIP1559Compatibility();
     const fromAccountIsCompatible = await this._getCurrentAccountEIP1559Compatibility(
       fromAddress,
@@ -230,6 +238,10 @@ export default class TransactionController extends EventEmitter {
    * @returns {Common} common configuration object
    */
   async getCommonConfiguration(fromAddress) {
+    console.log(' ');
+
+    console.log('getCommonConfiguration');
+
     const { type, nickname: name } = this.getProviderConfig();
     const supportsEIP1559 = await this.getEIP1559Compatibility(fromAddress);
 
@@ -242,6 +254,8 @@ export default class TransactionController extends EventEmitter {
     // network names are sufficient configuration, simply pass the name as the
     // chain argument in the constructor.
     if (type !== NETWORK_TYPE_RPC) {
+      console.log(' ');
+
       return new Common({
         chain: type,
         hardfork,
@@ -280,6 +294,8 @@ export default class TransactionController extends EventEmitter {
    * @fires ${txMeta.id}:unapproved
    */
   addTransaction(txMeta) {
+    console.log(' ');
+
     this.txStateManager.addTransaction(txMeta);
     this.emit(`${txMeta.id}:unapproved`, txMeta);
     this._trackTransactionMetricsEvent(txMeta, TRANSACTION_EVENTS.ADDED);
@@ -291,6 +307,8 @@ export default class TransactionController extends EventEmitter {
    * @param {string} address - hex string of the from address for txs being removed
    */
   wipeTransactions(address) {
+    console.log(' ');
+
     this.txStateManager.wipeTransactions(address);
   }
 
@@ -302,6 +320,10 @@ export default class TransactionController extends EventEmitter {
    * @param {Object} opts - with the key origin to put the origin on the txMeta
    */
   async newUnapprovedTransaction(txParams, opts = {}) {
+    console.log(' ');
+
+    console.log('newUnapprovedTransaction');
+
     log.debug(
       `MetaMaskController newUnapprovedTransaction ${JSON.stringify(txParams)}`,
     );
@@ -357,6 +379,8 @@ export default class TransactionController extends EventEmitter {
    * for the network returns undefined
    */
   _getTransaction(txId) {
+    console.log(' ');
+
     const { transactions } = this.store.getState();
     return transactions[txId];
   }
@@ -366,6 +390,8 @@ export default class TransactionController extends EventEmitter {
    * @returns {boolean}
    */
   _isUnapprovedTransaction(txId) {
+    console.log(' ');
+
     return (
       this.txStateManager.getTransaction(txId).status ===
       TRANSACTION_STATUSES.UNAPPROVED
@@ -377,7 +403,11 @@ export default class TransactionController extends EventEmitter {
    * @param {string} fnName
    */
   _throwErrorIfNotUnapprovedTx(txId, fnName) {
+    console.log(' ');
+
     if (!this._isUnapprovedTransaction(txId)) {
+      console.log(' ');
+
       throw new Error(
         `TransactionsController: Can only call ${fnName} on an unapproved transaction.
          Current tx status: ${this.txStateManager.getTransaction(txId).status}`,
@@ -386,6 +416,8 @@ export default class TransactionController extends EventEmitter {
   }
 
   _updateTransaction(txId, proposedUpdate, note) {
+    console.log(' ');
+
     const txMeta = this.txStateManager.getTransaction(txId);
     const updated = merge(txMeta, proposedUpdate);
     this.txStateManager.updateTransaction(updated, note);
@@ -433,6 +465,8 @@ export default class TransactionController extends EventEmitter {
    * @returns {TransactionMeta} the txMeta of the updated transaction
    */
   updateEditableParams(txId, { data, from, to, value, gas, gasPrice }) {
+    console.log(' ');
+
     this._throwErrorIfNotUnapprovedTx(txId, 'updateEditableParams');
 
     const editableParams = {
@@ -551,6 +585,8 @@ export default class TransactionController extends EventEmitter {
    * @returns {TransactionMeta} the txMeta of the updated transaction
    */
   updateSwapApprovalTransaction(txId, { type, sourceTokenSymbol }) {
+    console.log(' ');
+
     this._throwErrorIfNotUnapprovedTx(txId, 'updateSwapApprovalTransaction');
 
     let swapApprovalTransaction = { type, sourceTokenSymbol };
@@ -625,6 +661,8 @@ export default class TransactionController extends EventEmitter {
    * @returns {TransactionMeta} the txMeta of the updated transaction
    */
   updateTransactionUserSettings(txId, { userEditedGasLimit, userFeeLevel }) {
+    console.log(' ');
+
     this._throwErrorIfNotUnapprovedTx(txId, 'updateTransactionUserSettings');
 
     let userSettings = { userEditedGasLimit, userFeeLevel };
@@ -648,6 +686,10 @@ export default class TransactionController extends EventEmitter {
    * @returns {txMeta}
    */
   async addUnapprovedTransaction(txParams, origin, transactionType) {
+    console.log(' ');
+
+    console.log('addUnapprovedTransaction');
+
     if (
       transactionType !== undefined &&
       !SWAP_TRANSACTION_TYPES.includes(transactionType)
@@ -675,8 +717,12 @@ export default class TransactionController extends EventEmitter {
     });
 
     if (origin === 'metamask') {
+      console.log(' ');
+
       // Assert the from address is the selected address
       if (normalizedTxParams.from !== this.getSelectedAddress()) {
+        console.log(' ');
+
         throw ethErrors.rpc.internal({
           message: `Internally initiated transaction is using invalid account.`,
           data: {
@@ -691,6 +737,8 @@ export default class TransactionController extends EventEmitter {
       // the specified address
       const permittedAddresses = await this.getPermittedAccounts(origin);
       if (!permittedAddresses.includes(normalizedTxParams.from)) {
+        console.log(' ');
+
         throw ethErrors.provider.unauthorized({ data: { origin } });
       }
     }
@@ -712,6 +760,8 @@ export default class TransactionController extends EventEmitter {
     try {
       txMeta = await this.addTxGasDefaults(txMeta, getCodeResponse);
     } catch (error) {
+      console.log(' ');
+
       log.warn(error);
       txMeta = this.txStateManager.getTransaction(txMeta.id);
       txMeta.loadingDefaults = false;
@@ -740,6 +790,10 @@ export default class TransactionController extends EventEmitter {
    * @returns {Promise<object>} resolves with txMeta
    */
   async addTxGasDefaults(txMeta, getCodeResponse) {
+    console.log(' ');
+
+    console.log('addTxGasDefaults');
+
     const eip1559Compatibility =
       txMeta.txParams.type !== TRANSACTION_ENVELOPE_TYPES.LEGACY &&
       (await this.getEIP1559Compatibility());
@@ -756,10 +810,14 @@ export default class TransactionController extends EventEmitter {
     // eslint-disable-next-line no-param-reassign
     txMeta = this.txStateManager.getTransaction(txMeta.id);
     if (simulationFails) {
+      console.log(' ');
+
       txMeta.simulationFails = simulationFails;
     }
 
     if (eip1559Compatibility) {
+      console.log(' ');
+
       const { eip1559V2Enabled } = this.preferencesStore.getState();
       const advancedGasFeeDefaultValues = this.getAdvancedGasFee();
       if (
@@ -784,6 +842,8 @@ export default class TransactionController extends EventEmitter {
         txMeta.txParams.maxFeePerGas = txMeta.txParams.gasPrice;
         txMeta.txParams.maxPriorityFeePerGas = txMeta.txParams.gasPrice;
         if (eip1559V2Enabled && txMeta.origin !== 'metamask') {
+          console.log(' ');
+
           txMeta.userFeeLevel = PRIORITY_LEVELS.DAPP_SUGGESTED;
         } else {
           txMeta.userFeeLevel = CUSTOM_GAS_ESTIMATE;
@@ -798,12 +858,16 @@ export default class TransactionController extends EventEmitter {
         ) {
           txMeta.userFeeLevel = GAS_RECOMMENDATIONS.MEDIUM;
         } else if (eip1559V2Enabled) {
+          console.log(' ');
+
           txMeta.userFeeLevel = PRIORITY_LEVELS.DAPP_SUGGESTED;
         } else {
           txMeta.userFeeLevel = CUSTOM_GAS_ESTIMATE;
         }
 
         if (defaultMaxFeePerGas && !txMeta.txParams.maxFeePerGas) {
+          console.log(' ');
+
           // If the dapp has not set the gasPrice or the maxFeePerGas, then we set maxFeePerGas
           // with the one returned by the gasFeeController, if that is available.
           txMeta.txParams.maxFeePerGas = defaultMaxFeePerGas;
@@ -819,6 +883,8 @@ export default class TransactionController extends EventEmitter {
         }
 
         if (defaultGasPrice && !txMeta.txParams.maxFeePerGas) {
+          console.log(' ');
+
           // If the dapp has not set the gasPrice or the maxFeePerGas, and no maxFeePerGas is available
           // from the gasFeeController, then we set maxFeePerGas to the defaultGasPrice, assuming it is
           // available.
@@ -862,6 +928,8 @@ export default class TransactionController extends EventEmitter {
     }
 
     if (defaultGasLimit && !txMeta.txParams.gas) {
+      console.log(' ');
+
       txMeta.txParams.gas = defaultGasLimit;
       txMeta.originalGasEstimate = defaultGasLimit;
     }
@@ -883,6 +951,10 @@ export default class TransactionController extends EventEmitter {
    * @returns {Promise<string|undefined>} The default gas price
    */
   async _getDefaultGasFees(txMeta, eip1559Compatibility) {
+    console.log(' ');
+
+    console.log('_getDefaultGasFees');
+
     if (
       (!eip1559Compatibility && txMeta.txParams.gasPrice) ||
       (eip1559Compatibility &&
@@ -906,6 +978,8 @@ export default class TransactionController extends EventEmitter {
         } = gasFeeEstimates;
 
         if (suggestedMaxPriorityFeePerGas && suggestedMaxFeePerGas) {
+          console.log(' ');
+
           return {
             maxFeePerGas: decGWEIToHexWEI(suggestedMaxFeePerGas),
             maxPriorityFeePerGas: decGWEIToHexWEI(
@@ -914,12 +988,16 @@ export default class TransactionController extends EventEmitter {
           };
         }
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
+        console.log(' ');
+
         // The LEGACY type includes low, medium and high estimates of
         // gas price values.
         return {
           gasPrice: decGWEIToHexWEI(gasFeeEstimates.medium),
         };
       } else if (gasEstimateType === GAS_ESTIMATE_TYPES.ETH_GASPRICE) {
+        console.log(' ');
+
         // The ETH_GASPRICE type just includes a single gas price property,
         // which we can assume was retrieved from eth_gasPrice
         return {
@@ -927,6 +1005,8 @@ export default class TransactionController extends EventEmitter {
         };
       }
     } catch (e) {
+      console.log(' ');
+
       console.error(e);
     }
 
@@ -943,11 +1023,17 @@ export default class TransactionController extends EventEmitter {
    * @returns {Promise<Object>} Object containing the default gas limit, or the simulation failure object
    */
   async _getDefaultGasLimit(txMeta, getCodeResponse) {
+    console.log(' ');
+
+    console.log('_getDefaultGasLimit');
+
     const chainId = this._getCurrentChainId();
     const customNetworkGasBuffer = CHAIN_ID_TO_GAS_LIMIT_BUFFER_MAP[chainId];
     const chainType = getChainType(chainId);
 
     if (txMeta.txParams.gas) {
+      console.log(' ');
+
       return {};
     } else if (
       txMeta.txParams.to &&
@@ -956,6 +1042,8 @@ export default class TransactionController extends EventEmitter {
     ) {
       // if there's data in the params, but there's no contract code, it's not a valid transaction
       if (txMeta.txParams.data) {
+        console.log(' ');
+
         const err = new Error(
           'TxGasUtil - Trying to call a function on a non-contract address',
         );
@@ -1011,18 +1099,26 @@ export default class TransactionController extends EventEmitter {
     const previousGasParams = {};
     const newGasParams = {};
     if (customGasSettings.gasLimit) {
+      console.log(' ');
+
       newGasParams.gas = customGasSettings?.gas ?? GAS_LIMITS.SIMPLE;
     }
 
     if (customGasSettings.estimateSuggested) {
+      console.log(' ');
+
       newGasParams.estimateSuggested = customGasSettings.estimateSuggested;
     }
 
     if (customGasSettings.estimateUsed) {
+      console.log(' ');
+
       newGasParams.estimateUsed = customGasSettings.estimateUsed;
     }
 
     if (isEIP1559Transaction(originalTxMeta)) {
+      console.log(' ');
+
       previousGasParams.maxFeePerGas = txParams.maxFeePerGas;
       previousGasParams.maxPriorityFeePerGas = txParams.maxPriorityFeePerGas;
       newGasParams.maxFeePerGas =
@@ -1106,6 +1202,8 @@ export default class TransactionController extends EventEmitter {
     });
 
     if (estimatedBaseFee) {
+      console.log(' ');
+
       newTxMeta.estimatedBaseFee = estimatedBaseFee;
     }
 
@@ -1152,6 +1250,8 @@ export default class TransactionController extends EventEmitter {
     });
 
     if (estimatedBaseFee) {
+      console.log(' ');
+
       newTxMeta.estimatedBaseFee = estimatedBaseFee;
     }
 
@@ -1166,6 +1266,10 @@ export default class TransactionController extends EventEmitter {
    * @param {Object} txMeta - the updated txMeta
    */
   async updateTransaction(txMeta) {
+    console.log(' ');
+
+    console.log('updateTransaction');
+
     this.txStateManager.updateTransaction(
       txMeta,
       'confTx: user updated transaction',
@@ -1178,6 +1282,10 @@ export default class TransactionController extends EventEmitter {
    * @param {Object} txMeta
    */
   async updateAndApproveTransaction(txMeta) {
+    console.log(' ');
+
+    console.log('updateAndApproveTransaction');
+
     this.txStateManager.updateTransaction(
       txMeta,
       'confTx: user approved transaction',
@@ -1195,12 +1303,18 @@ export default class TransactionController extends EventEmitter {
    * @param {number} txId - the tx's Id
    */
   async approveTransaction(txId) {
+    console.log(' ');
+
+    console.log('approveTransaction');
+
     // TODO: Move this safety out of this function.
     // Since this transaction is async,
     // we need to keep track of what is currently being signed,
     // So that we do not increment nonce + resubmit something
     // that is already being incremented & signed.
     if (this.inProcessOfSigning.has(txId)) {
+      console.log(' ');
+
       return;
     }
     this.inProcessOfSigning.add(txId);
@@ -1229,6 +1343,8 @@ export default class TransactionController extends EventEmitter {
       // add nonce debugging information to txMeta
       txMeta.nonceDetails = nonceLock.nonceDetails;
       if (customNonceValue) {
+        console.log(' ');
+
         txMeta.nonceDetails.customNonceValue = customNonceValue;
       }
       this.txStateManager.updateTransaction(
@@ -1242,14 +1358,20 @@ export default class TransactionController extends EventEmitter {
       // must set transaction to submitted/failed before releasing lock
       nonceLock.releaseLock();
     } catch (err) {
+      console.log(' ');
+
       // this is try-catch wrapped so that we can guarantee that the nonceLock is released
       try {
         this._failTransaction(txId, err);
       } catch (err2) {
+        console.log(' ');
+
         log.error(err2);
       }
       // must set transaction to submitted/failed before releasing lock
       if (nonceLock) {
+        console.log(' ');
+
         nonceLock.releaseLock();
       }
       // continue with error chain
@@ -1260,7 +1382,13 @@ export default class TransactionController extends EventEmitter {
   }
 
   async approveTransactionsWithSameNonce(listOfTxParams = []) {
+    console.log(' ');
+
+    console.log('approveTransactionsWithSameNonce');
+
     if (listOfTxParams.length === 0) {
+      console.log(' ');
+
       return '';
     }
 
@@ -1272,6 +1400,8 @@ export default class TransactionController extends EventEmitter {
     const initialTxAsSerializedHex = bufferToHex(initialTxAsEthTx.serialize());
 
     if (this.inProcessOfSigning.has(initialTxAsSerializedHex)) {
+      console.log(' ');
+
       return '';
     }
     this.inProcessOfSigning.add(initialTxAsSerializedHex);
@@ -1289,12 +1419,16 @@ export default class TransactionController extends EventEmitter {
         }),
       );
     } catch (err) {
+      console.log(' ');
+
       log.error(err);
       // must set transaction to submitted/failed before releasing lock
       // continue with error chain
       throw err;
     } finally {
       if (nonceLock) {
+        console.log(' ');
+
         nonceLock.releaseLock();
       }
       this.inProcessOfSigning.delete(initialTxAsSerializedHex);
@@ -1303,6 +1437,10 @@ export default class TransactionController extends EventEmitter {
   }
 
   async signExternalTransaction(_txParams) {
+    console.log(' ');
+
+    console.log('signExternalTransaction');
+
     const normalizedTxParams = txUtils.normalizeTxParams(_txParams);
     // add network/chain id
     const chainId = this.getChainId();
@@ -1332,6 +1470,10 @@ export default class TransactionController extends EventEmitter {
    * @returns {string} rawTx
    */
   async signTransaction(txId) {
+    console.log(' ');
+
+    console.log('signTransaction');
+
     const txMeta = this.txStateManager.getTransaction(txId);
     // add network/chain id
     const chainId = this.getChainId();
@@ -1375,9 +1517,15 @@ export default class TransactionController extends EventEmitter {
    * @returns {Promise<void>}
    */
   async publishTransaction(txId, rawTx) {
+    console.log(' ');
+
+    console.log('publishTransaction');
+
     const txMeta = this.txStateManager.getTransaction(txId);
     txMeta.rawTx = rawTx;
     if (txMeta.type === TRANSACTION_TYPES.SWAP) {
+      console.log(' ');
+
       const preTxBalance = await this.query.getBalance(txMeta.txParams.from);
       txMeta.preTxBalance = preTxBalance.toString(16);
     }
@@ -1389,7 +1537,11 @@ export default class TransactionController extends EventEmitter {
     try {
       txHash = await this.query.sendRawTransaction(rawTx);
     } catch (error) {
+      console.log(' ');
+
       if (error.message.toLowerCase().includes('known transaction')) {
+        console.log(' ');
+
         txHash = keccak(toBuffer(addHexPrefix(rawTx), 'hex')).toString('hex');
         txHash = addHexPrefix(txHash);
       } else {
@@ -1414,11 +1566,17 @@ export default class TransactionController extends EventEmitter {
    * @returns {Promise<void>}
    */
   async confirmTransaction(txId, txReceipt, baseFeePerGas, blockTimestamp) {
+    console.log(' ');
+
+    console.log('confirmTransaction');
+
     // get the txReceipt before marking the transaction confirmed
     // to ensure the receipt is gotten before the ui revives the tx
     const txMeta = this.txStateManager.getTransaction(txId);
 
     if (!txMeta) {
+      console.log(' ');
+
       return;
     }
 
@@ -1431,9 +1589,13 @@ export default class TransactionController extends EventEmitter {
       };
 
       if (baseFeePerGas) {
+        console.log(' ');
+
         txMeta.baseFeePerGas = baseFeePerGas;
       }
       if (blockTimestamp) {
+        console.log(' ');
+
         txMeta.blockTimestamp = blockTimestamp;
       }
 
@@ -1444,12 +1606,16 @@ export default class TransactionController extends EventEmitter {
       const metricsParams = { gas_used: gasUsed };
 
       if (submittedTime) {
+        console.log(' ');
+
         metricsParams.completion_time = this._getTransactionCompletionTime(
           submittedTime,
         );
       }
 
       if (txReceipt.status === '0x0') {
+        console.log(' ');
+
         metricsParams.status = METRICS_STATUS_FAILED;
         // metricsParams.error = TODO: figure out a way to get the on-chain failure reason
       }
@@ -1466,6 +1632,8 @@ export default class TransactionController extends EventEmitter {
       );
 
       if (txMeta.type === TRANSACTION_TYPES.SWAP) {
+        console.log(' ');
+
         const postTxBalance = await this.query.getBalance(txMeta.txParams.from);
         const latestTxMeta = this.txStateManager.getTransaction(txId);
 
@@ -1483,15 +1651,23 @@ export default class TransactionController extends EventEmitter {
         this._trackSwapsMetrics(latestTxMeta, approvalTxMeta);
       }
     } catch (err) {
+      console.log(' ');
+
       log.error(err);
     }
   }
 
   async confirmExternalTransaction(txMeta, txReceipt, baseFeePerGas) {
+    console.log(' ');
+
+    console.log('confirmExternalTransaction');
+
     // add external transaction
     await this.txStateManager.addExternalTransaction(txMeta);
 
     if (!txMeta) {
+      console.log(' ');
+
       return;
     }
 
@@ -1506,6 +1682,8 @@ export default class TransactionController extends EventEmitter {
       };
 
       if (baseFeePerGas) {
+        console.log(' ');
+
         txMeta.baseFeePerGas = baseFeePerGas;
       }
 
@@ -1516,12 +1694,16 @@ export default class TransactionController extends EventEmitter {
       const metricsParams = { gas_used: gasUsed };
 
       if (submittedTime) {
+        console.log(' ');
+
         metricsParams.completion_time = this._getTransactionCompletionTime(
           submittedTime,
         );
       }
 
       if (txReceipt.status === '0x0') {
+        console.log(' ');
+
         metricsParams.status = METRICS_STATUS_FAILED;
         // metricsParams.error = TODO: figure out a way to get the on-chain failure reason
       }
@@ -1538,6 +1720,8 @@ export default class TransactionController extends EventEmitter {
       );
 
       if (txMeta.type === TRANSACTION_TYPES.SWAP) {
+        console.log(' ');
+
         const postTxBalance = await this.query.getBalance(txMeta.txParams.from);
         const latestTxMeta = this.txStateManager.getTransaction(txId);
 
@@ -1555,6 +1739,8 @@ export default class TransactionController extends EventEmitter {
         this._trackSwapsMetrics(latestTxMeta, approvalTxMeta);
       }
     } catch (err) {
+      console.log(' ');
+
       log.error(err);
     }
   }
@@ -1566,6 +1752,10 @@ export default class TransactionController extends EventEmitter {
    * @returns {Promise<void>}
    */
   async cancelTransaction(txId) {
+    console.log(' ');
+
+    console.log('cancelTransaction');
+
     const txMeta = this.txStateManager.getTransaction(txId);
     this.txStateManager.setTxStatusRejected(txId);
     this._trackTransactionMetricsEvent(txMeta, TRANSACTION_EVENTS.REJECTED);
@@ -1578,6 +1768,8 @@ export default class TransactionController extends EventEmitter {
    * @param {string} txHash - the hash for the txMeta
    */
   setTxHash(txId, txHash) {
+    console.log(' ');
+
     // Add the tx hash to the persisted meta-tx object
     const txMeta = this.txStateManager.getTransaction(txId);
     txMeta.hash = txHash;
@@ -1593,6 +1785,10 @@ export default class TransactionController extends EventEmitter {
    * @param {valueOf<TRANSACTION_EVENTS>} event - event type to create
    */
   async createTransactionEventFragment(transactionId, event) {
+    console.log(' ');
+
+    console.log('createTransactionEventFragment');
+
     const txMeta = this.txStateManager.getTransaction(transactionId);
     const {
       properties,
@@ -1646,6 +1842,8 @@ export default class TransactionController extends EventEmitter {
 
   // called once on startup
   async _updatePendingTxsAfterFirstBlock() {
+    console.log('_updatePendingTxsAfterFirstBlock');
+
     // wait for first block so we know we're ready
     await this.blockTracker.getLatestBlock();
     // get status update for all pending transactions (for the current network)
@@ -1734,6 +1932,8 @@ export default class TransactionController extends EventEmitter {
     });
     this.pendingTxTracker.on('tx:block-update', (txMeta, latestBlockNumber) => {
       if (!txMeta.firstRetryBlockNumber) {
+        console.log(' ');
+
         txMeta.firstRetryBlockNumber = latestBlockNumber;
         this.txStateManager.updateTransaction(
           txMeta,
@@ -1743,6 +1943,8 @@ export default class TransactionController extends EventEmitter {
     });
     this.pendingTxTracker.on('tx:retry', (txMeta) => {
       if (!('retryCount' in txMeta)) {
+        console.log(' ');
+
         txMeta.retryCount = 0;
       }
       txMeta.retryCount += 1;
@@ -1760,6 +1962,8 @@ export default class TransactionController extends EventEmitter {
    * @param {number} txId - the txId of the transaction that has been confirmed in a block
    */
   _markNonceDuplicatesDropped(txId) {
+    console.log(' ');
+
     // get the confirmed transactions nonce and from address
     const txMeta = this.txStateManager.getTransaction(txId);
     const { nonce, from } = txMeta.txParams;
@@ -1767,11 +1971,15 @@ export default class TransactionController extends EventEmitter {
       searchCriteria: { nonce, from },
     });
     if (!sameNonceTxs.length) {
+      console.log(' ');
+
       return;
     }
     // mark all same nonce transactions as dropped and give i a replacedBy hash
     sameNonceTxs.forEach((otherTxMeta) => {
       if (otherTxMeta.id === txId) {
+        console.log(' ');
+
         return;
       }
       otherTxMeta.replacedBy = txMeta.hash;
@@ -1794,9 +2002,13 @@ export default class TransactionController extends EventEmitter {
     function updateSubscription() {
       const pendingTxs = txStateManager.getPendingTransactions();
       if (!listenersAreActive && pendingTxs.length > 0) {
+        console.log(' ');
+
         blockTracker.on('latest', latestBlockHandler);
         listenersAreActive = true;
       } else if (listenersAreActive && !pendingTxs.length) {
+        console.log(' ');
+
         blockTracker.removeListener('latest', latestBlockHandler);
         listenersAreActive = false;
       }
@@ -1804,14 +2016,22 @@ export default class TransactionController extends EventEmitter {
   }
 
   async _onLatestBlock(blockNumber) {
+    console.log(' ');
+
+    console.log('_onLatestBlock');
+
     try {
       await this.pendingTxTracker.updatePendingTxs();
     } catch (err) {
+      console.log(' ');
+
       log.error(err);
     }
     try {
       await this.pendingTxTracker.resubmitPendingTxs(blockNumber);
     } catch (err) {
+      console.log(' ');
+
       log.error(err);
     }
   }
@@ -1828,8 +2048,14 @@ export default class TransactionController extends EventEmitter {
   }
 
   _trackSwapsMetrics(txMeta, approvalTxMeta) {
+    console.log(' ');
+
     if (this._getParticipateInMetrics() && txMeta.swapMetaData) {
+      console.log(' ');
+
       if (txMeta.txReceipt.status === '0x0') {
+        console.log(' ');
+
         this._trackMetaMetricsEvent({
           event: 'Swap Failed',
           sensitiveProperties: { ...txMeta.swapMetaData },
@@ -1876,6 +2102,10 @@ export default class TransactionController extends EventEmitter {
   }
 
   async _buildEventFragmentProperties(txMeta, extraParams) {
+    console.log(' ');
+
+    console.log('_buildEventFragmentProperties');
+
     const {
       type,
       time,
@@ -1904,6 +2134,8 @@ export default class TransactionController extends EventEmitter {
     const gasParams = {};
 
     if (isEIP1559Transaction(txMeta)) {
+      console.log(' ');
+
       gasParams.max_fee_per_gas = maxFeePerGas;
       gasParams.max_priority_fee_per_gas = maxPriorityFeePerGas;
     } else {
@@ -1911,8 +2143,12 @@ export default class TransactionController extends EventEmitter {
     }
 
     if (defaultGasEstimates) {
+      console.log(' ');
+
       const { estimateType } = defaultGasEstimates;
       if (estimateType) {
+        console.log(' ');
+
         gasParams.default_estimate = estimateType;
         let defaultMaxFeePerGas = txMeta.defaultGasEstimates.maxFeePerGas;
         let defaultMaxPriorityFeePerGas =
@@ -1927,11 +2163,15 @@ export default class TransactionController extends EventEmitter {
         ) {
           const { gasFeeEstimates } = await this._getEIP1559GasFeeEstimates();
           if (gasFeeEstimates?.[estimateType]?.suggestedMaxFeePerGas) {
+            console.log(' ');
+
             defaultMaxFeePerGas =
               gasFeeEstimates[estimateType]?.suggestedMaxFeePerGas;
             gasParams.default_max_fee_per_gas = defaultMaxFeePerGas;
           }
           if (gasFeeEstimates?.[estimateType]?.suggestedMaxPriorityFeePerGas) {
+            console.log(' ');
+
             defaultMaxPriorityFeePerGas =
               gasFeeEstimates[estimateType]?.suggestedMaxPriorityFeePerGas;
             gasParams.default_max_priority_fee_per_gas = defaultMaxPriorityFeePerGas;
@@ -1940,18 +2180,26 @@ export default class TransactionController extends EventEmitter {
       }
 
       if (txMeta.defaultGasEstimates.gas) {
+        console.log(' ');
+
         gasParams.default_gas = txMeta.defaultGasEstimates.gas;
       }
       if (txMeta.defaultGasEstimates.gasPrice) {
+        console.log(' ');
+
         gasParams.default_gas_price = txMeta.defaultGasEstimates.gasPrice;
       }
     }
 
     if (estimateSuggested) {
+      console.log(' ');
+
       gasParams.estimate_suggested = estimateSuggested;
     }
 
     if (estimateUsed) {
+      console.log(' ');
+
       gasParams.estimate_used = estimateUsed;
     }
 
@@ -1959,6 +2207,8 @@ export default class TransactionController extends EventEmitter {
 
     let eip1559Version = '0';
     if (txMeta.txParams.maxFeePerGas) {
+      console.log(' ');
+
       const { eip1559V2Enabled } = this.preferencesStore.getState();
       eip1559Version = eip1559V2Enabled ? '2' : '1';
     }
@@ -2021,6 +2271,8 @@ export default class TransactionController extends EventEmitter {
 
     const fragment = this.getEventFragmentById(uniqueIdentifier);
     if (typeof fragment !== 'undefined') {
+      console.log(' ');
+
       return;
     }
 
@@ -2120,7 +2372,13 @@ export default class TransactionController extends EventEmitter {
    * @param {Object} extraParams - optional props and values to include in sensitiveProperties
    */
   async _trackTransactionMetricsEvent(txMeta, event, extraParams = {}) {
+    console.log(' ');
+
+    console.log('_trackTransactionMetricsEvent');
+
     if (!txMeta) {
+      console.log(' ');
+
       return;
     }
     const {
@@ -2169,10 +2427,14 @@ export default class TransactionController extends EventEmitter {
   }
 
   _getTransactionCompletionTime(submittedTime) {
+    console.log(' ');
+
     return Math.round((Date.now() - submittedTime) / 1000).toString();
   }
 
   _getGasValuesInGWEI(gasParams) {
+    console.log(' ');
+
     const gasValuesInGwei = {};
     for (const param in gasParams) {
       if (isHexString(gasParams[param])) {
@@ -2185,6 +2447,8 @@ export default class TransactionController extends EventEmitter {
   }
 
   _failTransaction(txId, error) {
+    console.log(' ');
+
     this.txStateManager.setTxStatusFailed(txId, error);
     const txMeta = this.txStateManager.getTransaction(txId);
     this._trackTransactionMetricsEvent(txMeta, TRANSACTION_EVENTS.FINALIZED, {
@@ -2193,6 +2457,8 @@ export default class TransactionController extends EventEmitter {
   }
 
   _dropTransaction(txId) {
+    console.log(' ');
+
     this.txStateManager.setTxStatusDropped(txId);
     const txMeta = this.txStateManager.getTransaction(txId);
     this._trackTransactionMetricsEvent(txMeta, TRANSACTION_EVENTS.FINALIZED);

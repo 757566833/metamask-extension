@@ -81,12 +81,18 @@ export default class DetectTokensController {
    * @param tokens
    */
   async _getTokenBalances(tokens) {
+    console.log(' ');
+
+    console.log('_getTokenBalances');
+
     const ethContract = this.web3.eth
       .contract(SINGLE_CALL_BALANCES_ABI)
       .at(SINGLE_CALL_BALANCES_ADDRESS);
     return new Promise((resolve, reject) => {
       ethContract.balances([this.selectedAddress], tokens, (error, result) => {
         if (error) {
+          console.log(' ');
+
           return reject(error);
         }
         return resolve(result);
@@ -98,7 +104,11 @@ export default class DetectTokensController {
    * For each token in the tokenlist provided by the TokenListController, check selectedAddress balance.
    */
   async detectNewTokens() {
+    console.log('detectNewTokens');
+
     if (!this.isActive) {
+      console.log(' ');
+
       return;
     }
     if (
@@ -144,6 +154,8 @@ export default class DetectTokensController {
       tokensToDetect.slice(1000, tokensToDetect.length - 1),
     ];
     for (const tokensSlice of sliceOfTokensToDetect) {
+      console.log(' ');
+
       let result;
       try {
         result = process.env.TOKEN_DETECTION_V2
@@ -153,6 +165,8 @@ export default class DetectTokensController {
             )
           : await this._getTokenBalances(tokensSlice);
       } catch (error) {
+        console.log(' ');
+
         warn(
           `MetaMask - DetectTokensController single call balance fetch failed`,
           error,
@@ -162,9 +176,15 @@ export default class DetectTokensController {
 
       let tokensWithBalance = [];
       if (process.env.TOKEN_DETECTION_V2) {
+        console.log(' ');
+
         if (result) {
+          console.log(' ');
+
           const nonZeroTokenAddresses = Object.keys(result);
           for (const nonZeroTokenAddress of nonZeroTokenAddresses) {
+            console.log(' ');
+
             const {
               address,
               symbol,
@@ -181,6 +201,8 @@ export default class DetectTokensController {
             });
           }
           if (tokensWithBalance.length > 0) {
+            console.log(' ');
+
             await this.tokensController.addDetectedTokens(tokensWithBalance);
           }
         }
@@ -209,6 +231,8 @@ export default class DetectTokensController {
    */
   restartTokenDetection() {
     if (!(this.isActive && this.selectedAddress)) {
+      console.log(' ');
+
       return;
     }
     this.detectNewTokens();
@@ -220,8 +244,13 @@ export default class DetectTokensController {
    * @type {number}
    */
   set interval(interval) {
+    console.log(' ');
+
+    console.log(' ');
     this._handle && clearInterval(this._handle);
     if (!interval) {
+      console.log(' ');
+
       return;
     }
     this._handle = setInterval(() => {
@@ -233,7 +262,12 @@ export default class DetectTokensController {
    * @type {Object}
    */
   set network(network) {
+    console.log(' ');
+
+    console.log(' ');
     if (!network) {
+      console.log(' ');
+
       return;
     }
     this._network = network;
@@ -246,14 +280,23 @@ export default class DetectTokensController {
    * @type {Object}
    */
   set keyringMemStore(keyringMemStore) {
+    console.log(' ');
+
+    console.log(' ');
     if (!keyringMemStore) {
+      console.log(' ');
+
       return;
     }
     this._keyringMemStore = keyringMemStore;
     this._keyringMemStore.subscribe(({ isUnlocked }) => {
       if (this.isUnlocked !== isUnlocked) {
+        console.log(' ');
+
         this.isUnlocked = isUnlocked;
         if (isUnlocked) {
+          console.log(' ');
+
           this.restartTokenDetection();
         }
       }
@@ -264,7 +307,12 @@ export default class DetectTokensController {
    * @type {Object}
    */
   set tokenList(tokenList) {
+    console.log(' ');
+
+    console.log(' ');
     if (!tokenList) {
+      console.log(' ');
+
       return;
     }
     this._tokenList = tokenList;

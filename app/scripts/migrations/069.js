@@ -9,6 +9,10 @@ const version = 69;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -19,7 +23,11 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   if (typeof state?.SubjectMetadataController?.subjectMetadata === 'object') {
+    console.log(' ');
+
     const {
       SubjectMetadataController: { subjectMetadata },
     } = state;

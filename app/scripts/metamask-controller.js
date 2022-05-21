@@ -151,6 +151,8 @@ export default class MetamaskController extends EventEmitter {
    * @param {Object} opts
    */
   constructor(opts) {
+    console.log(' ');
+
     super();
 
     this.defaultMaxListeners = 20;
@@ -192,6 +194,8 @@ export default class MetamaskController extends EventEmitter {
 
     this.extension.runtime.onInstalled.addListener((details) => {
       if (details.reason === 'update' && version === '8.1.0') {
+        console.log(' ');
+
         this.platform.openExtensionInBrowser();
       }
     });
@@ -512,6 +516,8 @@ export default class MetamaskController extends EventEmitter {
     // start and stop polling for balances based on activeControllerConnections
     this.on('controllerConnectionChanged', (activeControllerConnections) => {
       if (activeControllerConnections > 0) {
+        console.log(' ');
+
         this.accountTracker.start();
         this.incomingTransactionsController.start();
         this.currencyRateController.start();
@@ -798,6 +804,8 @@ export default class MetamaskController extends EventEmitter {
         const frequentRpcListDetail = this.preferencesController.getFrequentRpcListDetail();
         let rpcPrefs = {};
         if (txMeta.chainId) {
+          console.log(' ');
+
           const rpcSettings = frequentRpcListDetail.find(
             (rpc) => txMeta.chainId === rpc.chainId,
           );
@@ -834,6 +842,8 @@ export default class MetamaskController extends EventEmitter {
 
           // if it is we check and update ownership status.
           if (knownCollectible) {
+            console.log(' ');
+
             this.collectiblesController.checkAndUpdateSingleCollectibleOwnershipStatus(
               knownCollectible,
               false,
@@ -845,6 +855,8 @@ export default class MetamaskController extends EventEmitter {
         const metamaskState = await this.getState();
 
         if (txReceipt && txReceipt.status === '0x0') {
+          console.log(' ');
+
           this.metaMetricsController.trackEvent(
             {
               event: 'Tx Status Update: On-Chain Failure',
@@ -869,6 +881,8 @@ export default class MetamaskController extends EventEmitter {
       try {
         await this.currencyRateController.setNativeCurrency(ticker);
       } catch (error) {
+        console.log(' ');
+
         // TODO: Handle failure to get conversion rate more gracefully
         console.error(error);
       }
@@ -1127,7 +1141,10 @@ export default class MetamaskController extends EventEmitter {
    */
   setupControllerEventSubscriptions() {
     const handleAccountsChange = async (origin, newAccounts) => {
+      console.log(' ');
       if (this.isUnlocked()) {
+        console.log(' ');
+
         this.notifyConnections(origin, {
           method: NOTIFICATION_NAMES.accountsChanged,
           // This should be the same as the return value of `eth_accounts`,
@@ -1149,14 +1166,21 @@ export default class MetamaskController extends EventEmitter {
     // This handles account changes whenever the selected address changes.
     let lastSelectedAddress;
     this.preferencesController.store.subscribe(async ({ selectedAddress }) => {
+      console.log(' ');
       if (selectedAddress && selectedAddress !== lastSelectedAddress) {
+        console.log(' ');
+
         lastSelectedAddress = selectedAddress;
         const permittedAccountsMap = getPermittedAccountsByOrigin(
           this.permissionController.state,
         );
 
         for (const [origin, accounts] of permittedAccountsMap.entries()) {
+          console.log(' ');
+
           if (accounts.includes(selectedAddress)) {
+            console.log(' ');
+
             handleAccountsChange(origin, accounts);
           }
         }
@@ -1168,9 +1192,12 @@ export default class MetamaskController extends EventEmitter {
     this.controllerMessenger.subscribe(
       `${this.permissionController.name}:stateChange`,
       async (currentValue, previousValue) => {
+        console.log(' ');
         const changedAccounts = getChangedAccounts(currentValue, previousValue);
 
         for (const [origin, accounts] of changedAccounts.entries()) {
+          console.log(' ');
+
           handleAccountsChange(origin, accounts);
         }
       },
@@ -1224,10 +1251,15 @@ export default class MetamaskController extends EventEmitter {
       version,
       // account mgmt
       getAccounts: async ({ origin }) => {
+        console.log(' ');
         if (origin === 'metamask') {
+          console.log(' ');
+
           const selectedAddress = this.preferencesController.getSelectedAddress();
           return selectedAddress ? [selectedAddress] : [];
         } else if (this.isUnlocked()) {
+          console.log(' ');
+
           return await this.getPermittedAccounts(origin);
         }
         return []; // changing this is a breaking change
@@ -1272,13 +1304,21 @@ export default class MetamaskController extends EventEmitter {
     updatePublicConfigStore(this.getState());
 
     function updatePublicConfigStore(memState) {
+      console.log(' ');
+
+      console.log(' ');
       const chainId = networkController.getCurrentChainId();
       if (memState.network !== 'loading') {
+        console.log(' ');
+
         publicConfigStore.putState(selectPublicState(chainId, memState));
       }
     }
 
     function selectPublicState(chainId, { isUnlocked, network }) {
+      console.log(' ');
+
+      console.log(' ');
       return {
         isUnlocked,
         chainId,
@@ -1301,6 +1341,10 @@ export default class MetamaskController extends EventEmitter {
    * }>} An object with relevant state properties.
    */
   async getProviderState(origin) {
+    console.log(' ');
+
+    console.log('getProviderState');
+
     return {
       isUnlocked: this.isUnlocked(),
       ...this.getProviderNetworkState(),
@@ -1316,6 +1360,9 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Object} An object with relevant network state properties.
    */
   getProviderNetworkState(memState) {
+    console.log(' ');
+
+    console.log(' ');
     const { network } = memState || this.getState();
     return {
       chainId: this.networkController.getCurrentChainId(),
@@ -1875,6 +1922,10 @@ export default class MetamaskController extends EventEmitter {
   }
 
   async getTokenStandardAndDetails(address, userAddress, tokenId) {
+    console.log(' ');
+
+    console.log('getTokenStandardAndDetails');
+
     const details = await this.assetsContractController.getTokenStandardAndDetails(
       address,
       userAddress,
@@ -1905,11 +1956,17 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Object} vault
    */
   async createNewVaultAndKeychain(password) {
+    console.log(' ');
+
+    console.log('createNewVaultAndKeychain');
+
     const releaseLock = await this.createVaultMutex.acquire();
     try {
       let vault;
       const accounts = await this.keyringController.getAccounts();
       if (accounts.length > 0) {
+        console.log(' ');
+
         vault = await this.keyringController.fullUpdate();
       } else {
         vault = await this.keyringController.createNewVaultAndKeychain(
@@ -1934,6 +1991,10 @@ export default class MetamaskController extends EventEmitter {
    * of UTF-8 bytes.
    */
   async createNewVaultAndRestore(password, encodedSeedPhrase) {
+    console.log(' ');
+
+    console.log('createNewVaultAndRestore');
+
     const releaseLock = await this.createVaultMutex.acquire();
     try {
       let accounts, lastBalance;
@@ -1974,11 +2035,15 @@ export default class MetamaskController extends EventEmitter {
         'HD Key Tree',
       )[0];
       if (!primaryKeyring) {
+        console.log(' ');
+
         throw new Error('MetamaskController - No HD Key Tree found');
       }
 
       // seek out the first zero balance
       while (lastBalance !== '0x0') {
+        console.log(' ');
+
         await keyringController.addNewAccount(primaryKeyring);
         accounts = await keyringController.getAccounts();
         lastBalance = await this.getBalance(
@@ -1989,6 +2054,8 @@ export default class MetamaskController extends EventEmitter {
 
       // remove extra zero balance account potentially created from seeking ahead
       if (accounts.length > 1 && lastBalance === '0x0') {
+        console.log(' ');
+
         await this.removeAccount(accounts[accounts.length - 1]);
         accounts = await keyringController.getAccounts();
       }
@@ -2016,14 +2083,21 @@ export default class MetamaskController extends EventEmitter {
    * @param {EthQuery} ethQuery - The EthQuery instance to use when asking the network
    */
   getBalance(address, ethQuery) {
+    console.log(' ');
+
+    console.log(' ');
     return new Promise((resolve, reject) => {
       const cached = this.accountTracker.store.getState().accounts[address];
 
       if (cached && cached.balance) {
+        console.log(' ');
+
         resolve(cached.balance);
       } else {
         ethQuery.getBalance(address, (error, balance) => {
           if (error) {
+            console.log(' ');
+
             reject(error);
             log.error(error);
           } else {
@@ -2041,6 +2115,8 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<Object>} Parts of the state that we want to syncx
    */
   async fetchInfoToSync() {
+    console.log('fetchInfoToSync');
+
     // Preferences
     const {
       currentLocale,
@@ -2073,6 +2149,8 @@ export default class MetamaskController extends EventEmitter {
           checksummedAccountAddress
         ].filter((asset) => {
           if (asset.isERC721 === undefined) {
+            console.log(' ');
+
             // since the token.address from allTokens is checksumaddress
             // asset.address have to be changed to lowercase when we are using dynamic list
             const address = useTokenDetection
@@ -2080,9 +2158,13 @@ export default class MetamaskController extends EventEmitter {
               : asset.address;
             // the tokenList will be holding only erc20 tokens
             if (tokenList[address] !== undefined) {
+              console.log(' ');
+
               return true;
             }
           } else if (asset.isERC721 === false) {
+            console.log(' ');
+
             return true;
           }
           return false;
@@ -2144,24 +2226,36 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<object>} The keyringController update.
    */
   async submitPassword(password) {
+    console.log(' ');
+
+    console.log('submitPassword');
+
     await this.keyringController.submitPassword(password);
 
     try {
       await this.blockTracker.checkForLatestBlock();
     } catch (error) {
+      console.log(' ');
+
       log.error('Error while unlocking extension.', error);
     }
 
     try {
       const threeBoxSyncingAllowed = this.threeBoxController.getThreeBoxSyncingState();
       if (threeBoxSyncingAllowed && !this.threeBoxController.box) {
+        console.log(' ');
+
         // 'await' intentionally omitted to avoid waiting for initialization
         this.threeBoxController.init();
         this.threeBoxController.turnThreeBoxSyncingOn();
       } else if (threeBoxSyncingAllowed && this.threeBoxController.box) {
+        console.log(' ');
+
         this.threeBoxController.turnThreeBoxSyncingOn();
       }
     } catch (error) {
+      console.log(' ');
+
       log.error('Error while unlocking extension.', error);
     }
 
@@ -2182,6 +2276,10 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} password - The user's password
    */
   async verifyPassword(password) {
+    console.log(' ');
+
+    console.log('verifyPassword');
+
     await this.keyringController.verifyPassword(password);
   }
 
@@ -2206,8 +2304,11 @@ export default class MetamaskController extends EventEmitter {
    * Gets the mnemonic of the user's primary keyring.
    */
   getPrimaryKeyringMnemonic() {
+    console.log(' ');
     const keyring = this.keyringController.getKeyringsByType('HD Key Tree')[0];
     if (!keyring.mnemonic) {
+      console.log(' ');
+
       throw new Error('Primary keyring mnemonic unavailable.');
     }
     return keyring.mnemonic;
@@ -2218,6 +2319,10 @@ export default class MetamaskController extends EventEmitter {
   //
 
   async getKeyringForDevice(deviceName, hdPath = null) {
+    console.log(' ');
+
+    console.log('getKeyringForDevice');
+
     let keyringName = null;
     switch (deviceName) {
       case DEVICE_NAMES.TREZOR:
@@ -2241,15 +2346,23 @@ export default class MetamaskController extends EventEmitter {
       keyringName,
     )[0];
     if (!keyring) {
+      console.log(' ');
+
       keyring = await this.keyringController.addNewKeyring(keyringName);
     }
     if (hdPath && keyring.setHdPath) {
+      console.log(' ');
+
       keyring.setHdPath(hdPath);
     }
     if (deviceName === DEVICE_NAMES.LATTICE) {
+      console.log(' ');
+
       keyring.appName = 'MetaMask';
     }
     if (deviceName === DEVICE_NAMES.TREZOR) {
+      console.log(' ');
+
       const model = keyring.getModel();
       this.appStateController.setTrezorModel(model);
     }
@@ -2260,11 +2373,15 @@ export default class MetamaskController extends EventEmitter {
   }
 
   async attemptLedgerTransportCreation() {
+    console.log('attemptLedgerTransportCreation');
+
     const keyring = await this.getKeyringForDevice(DEVICE_NAMES.LEDGER);
     return await keyring.attemptMakeApp();
   }
 
   async establishLedgerTransportPreference() {
+    console.log('establishLedgerTransportPreference');
+
     const transportPreference = this.preferencesController.getLedgerTransportPreference();
     return await this.setLedgerTransportPreference(transportPreference);
   }
@@ -2278,6 +2395,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns [] accounts
    */
   async connectHardware(deviceName, page, hdPath) {
+    console.log(' ');
+
+    console.log('connectHardware');
+
     const keyring = await this.getKeyringForDevice(deviceName, hdPath);
     let accounts = [];
     switch (page) {
@@ -2311,6 +2432,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<boolean>}
    */
   async checkHardwareStatus(deviceName, hdPath) {
+    console.log(' ');
+
+    console.log('checkHardwareStatus');
+
     const keyring = await this.getKeyringForDevice(deviceName, hdPath);
     return keyring.isUnlocked();
   }
@@ -2322,6 +2447,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<boolean>}
    */
   async forgetDevice(deviceName) {
+    console.log(' ');
+
+    console.log('forgetDevice');
+
     const keyring = await this.getKeyringForDevice(deviceName);
     keyring.forgetDevice();
     return true;
@@ -2335,6 +2464,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {'hardware' | 'imported' | 'MetaMask'}
    */
   async getAccountType(address) {
+    console.log(' ');
+
+    console.log('getAccountType');
+
     const keyring = await this.keyringController.getKeyringForAccount(address);
     switch (keyring.type) {
       case KEYRING_TYPES.TREZOR:
@@ -2358,6 +2491,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {'ledger' | 'lattice' | 'N/A' | string}
    */
   async getDeviceModel(address) {
+    console.log(' ');
+
+    console.log('getDeviceModel');
+
     const keyring = await this.keyringController.getKeyringForAccount(address);
     switch (keyring.type) {
       case KEYRING_TYPES.TREZOR:
@@ -2382,6 +2519,9 @@ export default class MetamaskController extends EventEmitter {
    */
 
   getAccountLabel(name, index, hdPathDescription) {
+    console.log(' ');
+
+    console.log(' ');
     return `${name[0].toUpperCase()}${name.slice(1)} ${
       parseInt(index, 10) + 1
     } ${hdPathDescription || ''}`.trim();
@@ -2411,6 +2551,8 @@ export default class MetamaskController extends EventEmitter {
     this.preferencesController.setAddresses(newAccounts);
     newAccounts.forEach((address) => {
       if (!oldAccounts.includes(address)) {
+        console.log(' ');
+
         const label = this.getAccountLabel(
           deviceName === DEVICE_NAMES.QR ? keyring.getName() : deviceName,
           index,
@@ -2437,10 +2579,14 @@ export default class MetamaskController extends EventEmitter {
    * @returns {} keyState
    */
   async addNewAccount() {
+    console.log('addNewAccount');
+
     const primaryKeyring = this.keyringController.getKeyringsByType(
       'HD Key Tree',
     )[0];
     if (!primaryKeyring) {
+      console.log(' ');
+
       throw new Error('MetamaskController - No HD Key Tree found');
     }
     const { keyringController } = this;
@@ -2453,6 +2599,8 @@ export default class MetamaskController extends EventEmitter {
     this.preferencesController.setAddresses(newAccounts);
     newAccounts.forEach((address) => {
       if (!oldAccounts.includes(address)) {
+        console.log(' ');
+
         this.preferencesController.setSelectedAddress(address);
       }
     });
@@ -2472,10 +2620,14 @@ export default class MetamaskController extends EventEmitter {
    * encoded as an array of UTF-8 bytes.
    */
   async verifySeedPhrase() {
+    console.log('verifySeedPhrase');
+
     const primaryKeyring = this.keyringController.getKeyringsByType(
       'HD Key Tree',
     )[0];
     if (!primaryKeyring) {
+      console.log(' ');
+
       throw new Error('MetamaskController - No HD Key Tree found');
     }
 
@@ -2484,6 +2636,8 @@ export default class MetamaskController extends EventEmitter {
 
     const accounts = await primaryKeyring.getAccounts();
     if (accounts.length < 1) {
+      console.log(' ');
+
       throw new Error('MetamaskController - No accounts found');
     }
 
@@ -2491,6 +2645,8 @@ export default class MetamaskController extends EventEmitter {
       await seedPhraseVerifier.verifyAccounts(accounts, seedPhraseAsBuffer);
       return Array.from(seedPhraseAsBuffer.values());
     } catch (err) {
+      console.log(' ');
+
       log.error(err.message);
       throw err;
     }
@@ -2504,6 +2660,8 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<string>} The current selected address.
    */
   async resetAccount() {
+    console.log('resetAccount');
+
     const selectedAddress = this.preferencesController.getSelectedAddress();
     this.txController.wipeTransactions(selectedAddress);
     this.networkController.resetConnection();
@@ -2520,13 +2678,21 @@ export default class MetamaskController extends EventEmitter {
    * array.
    */
   async getPermittedAccounts(origin) {
+    console.log(' ');
+
+    console.log('getPermittedAccounts');
+
     try {
       return await this.permissionController.executeRestrictedMethod(
         origin,
         RestrictedMethods.eth_accounts,
       );
     } catch (error) {
+      console.log(' ');
+
       if (error.code === rpcErrorCodes.provider.unauthorized) {
+        console.log(' ');
+
         return [];
       }
       throw error;
@@ -2544,6 +2710,9 @@ export default class MetamaskController extends EventEmitter {
    * to third parties.
    */
   removeAllAccountPermissions(targetAccount) {
+    console.log(' ');
+
+    console.log(' ');
     this.permissionController.updatePermissionsByCaveat(
       CaveatTypes.restrictReturnedAccounts,
       (existingAccounts) =>
@@ -2559,6 +2728,10 @@ export default class MetamaskController extends EventEmitter {
    * @param {string[]} address - A hex address
    */
   async removeAccount(address) {
+    console.log(' ');
+
+    console.log('removeAccount');
+
     // Remove all associated permissions
     this.removeAllAccountPermissions(address);
     // Remove account from the preferences controller
@@ -2580,6 +2753,10 @@ export default class MetamaskController extends EventEmitter {
    * @param {any} args - The data required by that strategy to import an account.
    */
   async importAccountWithStrategy(strategy, args) {
+    console.log(' ');
+
+    console.log('importAccountWithStrategy');
+
     const privateKey = await accountImporter.importAccount(strategy, args);
     const keyring = await this.keyringController.addNewKeyring(
       'Simple Key Pair',
@@ -2605,6 +2782,10 @@ export default class MetamaskController extends EventEmitter {
    * @param {Object} [req] - The original request, containing the origin.
    */
   async newUnapprovedTransaction(txParams, req) {
+    console.log(' ');
+
+    console.log('newUnapprovedTransaction');
+
     return await this.txController.newUnapprovedTransaction(txParams, req);
   }
 
@@ -2620,12 +2801,18 @@ export default class MetamaskController extends EventEmitter {
    * @param {Object} [req] - The original request, containing the origin.
    */
   async newUnsignedMessage(msgParams, req) {
+    console.log(' ');
+
+    console.log('newUnsignedMessage');
+
     const data = normalizeMsgData(msgParams.data);
     let promise;
     // 64 hex + "0x" at the beginning
     // This is needed because Ethereum's EcSign works only on 32 byte numbers
     // For 67 length see: https://github.com/MetaMask/metamask-extension/pull/12679/files#r749479607
     if (data.length === 66 || data.length === 67) {
+      console.log(' ');
+
       promise = this.messageManager.addUnapprovedMessageAsync(msgParams, req);
       this.sendUpdate();
       this.opts.showUserConfirmation();
@@ -2651,9 +2838,15 @@ export default class MetamaskController extends EventEmitter {
    * The first account in the keyring will be used by default.
    */
   async getAppKeyForSubject(subject, requestedAccount) {
+    console.log(' ');
+
+    console.log('getAppKeyForSubject');
+
     let account;
 
     if (requestedAccount) {
+      console.log(' ');
+
       account = requestedAccount;
     } else {
       account = (await this.keyringController.getAccounts())[0];
@@ -2670,6 +2863,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<Object>} Full state update.
    */
   async signMessage(msgParams) {
+    console.log(' ');
+
+    console.log('signMessage');
+
     log.info('MetaMaskController - signMessage');
     const msgId = msgParams.metamaskId;
     try {
@@ -2682,6 +2879,8 @@ export default class MetamaskController extends EventEmitter {
       this.messageManager.setMsgStatusSigned(msgId, rawSig);
       return this.getState();
     } catch (error) {
+      console.log(' ');
+
       log.info('MetaMaskController - eth_sign failed', error);
       this.messageManager.errorMessage(msgId, error);
       throw error;
@@ -2694,6 +2893,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} msgId - The id of the message to cancel.
    */
   cancelMessage(msgId) {
+    console.log(' ');
+
+    console.log(' ');
     const { messageManager } = this;
     messageManager.rejectMsg(msgId);
     return this.getState();
@@ -2712,6 +2914,10 @@ export default class MetamaskController extends EventEmitter {
    * @param {Object} [req] - The original request, containing the origin.
    */
   async newUnsignedPersonalMessage(msgParams, req) {
+    console.log(' ');
+
+    console.log('newUnsignedPersonalMessage');
+
     const promise = this.personalMessageManager.addUnapprovedMessageAsync(
       msgParams,
       req,
@@ -2729,6 +2935,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<Object>} A full state update.
    */
   async signPersonalMessage(msgParams) {
+    console.log(' ');
+
+    console.log('signPersonalMessage');
+
     log.info('MetaMaskController - signPersonalMessage');
     const msgId = msgParams.metamaskId;
     // sets the status op the message to 'approved'
@@ -2745,6 +2955,8 @@ export default class MetamaskController extends EventEmitter {
       this.personalMessageManager.setMsgStatusSigned(msgId, rawSig);
       return this.getState();
     } catch (error) {
+      console.log(' ');
+
       log.info('MetaMaskController - eth_personalSign failed', error);
       this.personalMessageManager.errorMessage(msgId, error);
       throw error;
@@ -2757,6 +2969,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} msgId - The ID of the message to cancel.
    */
   cancelPersonalMessage(msgId) {
+    console.log(' ');
+
+    console.log(' ');
     const messageManager = this.personalMessageManager;
     messageManager.rejectMsg(msgId);
     return this.getState();
@@ -2772,6 +2987,10 @@ export default class MetamaskController extends EventEmitter {
    * Passed back to the requesting Dapp.
    */
   async newRequestDecryptMessage(msgParams, req) {
+    console.log(' ');
+
+    console.log('newRequestDecryptMessage');
+
     const promise = this.decryptMessageManager.addUnapprovedMessageAsync(
       msgParams,
       req,
@@ -2788,6 +3007,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<Object>} A full state update.
    */
   async decryptMessageInline(msgParams) {
+    console.log(' ');
+
+    console.log('decryptMessageInline');
+
     log.info('MetaMaskController - decryptMessageInline');
     // decrypt the message inline
     const msgId = msgParams.metamaskId;
@@ -2799,6 +3022,8 @@ export default class MetamaskController extends EventEmitter {
 
       msg.rawData = await this.keyringController.decryptMessage(msgParams);
     } catch (e) {
+      console.log(' ');
+
       msg.error = e.message;
     }
     this.decryptMessageManager._updateMsg(msg);
@@ -2814,6 +3039,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<Object>} A full state update.
    */
   async decryptMessage(msgParams) {
+    console.log(' ');
+
+    console.log('decryptMessage');
+
     log.info('MetaMaskController - decryptMessage');
     const msgId = msgParams.metamaskId;
     // sets the status op the message to 'approved'
@@ -2834,6 +3063,8 @@ export default class MetamaskController extends EventEmitter {
       // tells the listener that the message has been decrypted and can be returned to the dapp
       this.decryptMessageManager.setMsgStatusDecrypted(msgId, rawMess);
     } catch (error) {
+      console.log(' ');
+
       log.info('MetaMaskController - eth_decrypt failed.', error);
       this.decryptMessageManager.errorMessage(msgId, error);
     }
@@ -2846,6 +3077,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} msgId - The ID of the message to cancel.
    */
   cancelDecryptMessage(msgId) {
+    console.log(' ');
+
+    console.log(' ');
     const messageManager = this.decryptMessageManager;
     messageManager.rejectMsg(msgId);
     return this.getState();
@@ -2861,6 +3095,10 @@ export default class MetamaskController extends EventEmitter {
    * Passed back to the requesting Dapp.
    */
   async newRequestEncryptionPublicKey(msgParams, req) {
+    console.log(' ');
+
+    console.log('newRequestEncryptionPublicKey');
+
     const address = msgParams;
     const keyring = await this.keyringController.getKeyringForAccount(address);
 
@@ -2915,6 +3153,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<Object>} A full state update.
    */
   async encryptionPublicKey(msgParams) {
+    console.log(' ');
+
+    console.log('encryptionPublicKey');
+
     log.info('MetaMaskController - encryptionPublicKey');
     const msgId = msgParams.metamaskId;
     // sets the status op the message to 'approved'
@@ -2933,6 +3175,8 @@ export default class MetamaskController extends EventEmitter {
       // and can be returned to the dapp
       this.encryptionPublicKeyManager.setMsgStatusReceived(msgId, publicKey);
     } catch (error) {
+      console.log(' ');
+
       log.info(
         'MetaMaskController - eth_getEncryptionPublicKey failed.',
         error,
@@ -2948,6 +3192,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} msgId - The ID of the message to cancel.
    */
   cancelEncryptionPublicKey(msgId) {
+    console.log(' ');
+
+    console.log(' ');
     const messageManager = this.encryptionPublicKeyManager;
     messageManager.rejectMsg(msgId);
     return this.getState();
@@ -2963,6 +3210,9 @@ export default class MetamaskController extends EventEmitter {
    * @param version
    */
   newUnsignedTypedMessage(msgParams, req, version) {
+    console.log(' ');
+
+    console.log(' ');
     const promise = this.typedMessageManager.addUnapprovedMessageAsync(
       msgParams,
       req,
@@ -2981,6 +3231,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Object} Full state update.
    */
   async signTypedMessage(msgParams) {
+    console.log(' ');
+
+    console.log('signTypedMessage');
+
     log.info('MetaMaskController - eth_signTypedData');
     const msgId = msgParams.metamaskId;
     const { version } = msgParams;
@@ -2991,8 +3245,12 @@ export default class MetamaskController extends EventEmitter {
 
       // For some reason every version after V1 used stringified params.
       if (version !== 'V1') {
+        console.log(' ');
+
         // But we don't have to require that. We can stop suggesting it now:
         if (typeof cleanMsgParams.data === 'string') {
+          console.log(' ');
+
           cleanMsgParams.data = JSON.parse(cleanMsgParams.data);
         }
       }
@@ -3004,6 +3262,8 @@ export default class MetamaskController extends EventEmitter {
       this.typedMessageManager.setMsgStatusSigned(msgId, signature);
       return this.getState();
     } catch (error) {
+      console.log(' ');
+
       log.info('MetaMaskController - eth_signTypedData failed.', error);
       this.typedMessageManager.errorMessage(msgId, error);
       throw error;
@@ -3016,6 +3276,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} msgId - The ID of the message to cancel.
    */
   cancelTypedMessage(msgId) {
+    console.log(' ');
+
+    console.log(' ');
     const messageManager = this.typedMessageManager;
     messageManager.rejectMsg(msgId);
     return this.getState();
@@ -3025,6 +3288,8 @@ export default class MetamaskController extends EventEmitter {
    * @returns {boolean} true if the keyring type supports EIP-1559
    */
   async getCurrentAccountEIP1559Compatibility() {
+    console.log('getCurrentAccountEIP1559Compatibility');
+
     return true;
   }
 
@@ -3087,11 +3352,16 @@ export default class MetamaskController extends EventEmitter {
   }
 
   estimateGas(estimateGasParams) {
+    console.log(' ');
+
+    console.log(' ');
     return new Promise((resolve, reject) => {
       return this.txController.txGasUtil.query.estimateGas(
         estimateGasParams,
         (err, res) => {
           if (err) {
+            console.log(' ');
+
             return reject(err);
           }
 
@@ -3150,21 +3420,32 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} [options.subjectType] - The type of the sender, i.e. subject.
    */
   setupUntrustedCommunication({ connectionStream, sender, subjectType }) {
+    console.log(' ');
+
+    console.log(' ');
     const { usePhishDetect } = this.preferencesController.store.getState();
 
     let _subjectType;
     if (subjectType) {
+      console.log(' ');
+
       _subjectType = subjectType;
     } else if (sender.id && sender.id !== this.extension.runtime.id) {
+      console.log(' ');
+
       _subjectType = SUBJECT_TYPES.EXTENSION;
     } else {
       _subjectType = SUBJECT_TYPES.WEBSITE;
     }
 
     if (sender.url) {
+      console.log(' ');
+
       const { hostname } = new URL(sender.url);
       // Check if new connection is blocked if phishing detection is on
       if (usePhishDetect && this.phishingController.test(hostname)) {
+        console.log(' ');
+
         log.debug('MetaMask - sending phishing warning for', hostname);
         this.sendPhishingWarning(connectionStream, hostname);
         return;
@@ -3183,6 +3464,8 @@ export default class MetamaskController extends EventEmitter {
 
     // TODO:LegacyProvider: Delete
     if (sender.url) {
+      console.log(' ');
+
       // legacy streams
       this.setupPublicConfig(mux.createStream('publicConfig'));
     }
@@ -3198,6 +3481,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {MessageSender} sender - The sender of the messages on this stream
    */
   setupTrustedCommunication(connectionStream, sender) {
+    console.log(' ');
+
+    console.log(' ');
     // setup multiplexing
     const mux = setupMultiplex(connectionStream);
     // connect features
@@ -3219,6 +3505,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} hostname - The hostname that triggered the suspicion.
    */
   sendPhishingWarning(connectionStream, hostname) {
+    console.log(' ');
+
+    console.log(' ');
     const mux = setupMultiplex(connectionStream);
     const phishingStream = mux.createStream('phishing');
     phishingStream.write({ hostname });
@@ -3230,6 +3519,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {*} outStream - The stream to provide our API over.
    */
   setupControllerConnection(outStream) {
+    console.log(' ');
+
+    console.log(' ');
     const api = this.getApi();
 
     // report new active controller connection
@@ -3240,6 +3532,8 @@ export default class MetamaskController extends EventEmitter {
     outStream.on('data', createMetaRPCHandler(api, outStream));
     const handleUpdate = (update) => {
       if (outStream._writableState.ended) {
+        console.log(' ');
+
         return;
       }
       // send notification to client-side
@@ -3268,12 +3562,19 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} subjectType - The type of the sender, i.e. subject.
    */
   setupProviderConnection(outStream, sender, subjectType) {
+    console.log(' ');
+
+    console.log(' ');
     let origin;
     if (subjectType === SUBJECT_TYPES.INTERNAL) {
+      console.log(' ');
+
       origin = 'metamask';
     }
     ///: BEGIN:ONLY_INCLUDE_IN(flask)
     else if (subjectType === SUBJECT_TYPES.SNAP) {
+      console.log(' ');
+
       origin = sender.snapId;
     }
     ///: END:ONLY_INCLUDE_IN
@@ -3282,6 +3583,8 @@ export default class MetamaskController extends EventEmitter {
     }
 
     if (sender.id && sender.id !== this.extension.runtime.id) {
+      console.log(' ');
+
       this.subjectMetadataController.addSubjectMetadata({
         origin,
         extensionId: sender.id,
@@ -3291,6 +3594,8 @@ export default class MetamaskController extends EventEmitter {
 
     let tabId;
     if (sender.tab && sender.tab.id) {
+      console.log(' ');
+
       tabId = sender.tab.id;
     }
 
@@ -3310,11 +3615,15 @@ export default class MetamaskController extends EventEmitter {
       // handle any middleware cleanup
       engine._middleware.forEach((mid) => {
         if (mid.destroy && typeof mid.destroy === 'function') {
+          console.log(' ');
+
           mid.destroy();
         }
       });
       connectionId && this.removeConnection(origin, connectionId);
       if (err) {
+        console.log(' ');
+
         log.error(err);
       }
     });
@@ -3328,6 +3637,9 @@ export default class MetamaskController extends EventEmitter {
    * @param error
    */
   onExecutionEnvironmentError(snapId, error) {
+    console.log(' ');
+
+    console.log(' ');
     this.snapController.stopPlugin(snapId);
     this.snapController.addSnapError(error);
   }
@@ -3339,6 +3651,9 @@ export default class MetamaskController extends EventEmitter {
    * @param connectionStream
    */
   setupSnapProvider(snapId, connectionStream) {
+    console.log(' ');
+
+    console.log(' ');
     this.setupUntrustedCommunication({
       connectionStream,
       sender: { snapId },
@@ -3357,6 +3672,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {tabId} [options.tabId] - The tab ID of the sender - if the sender is within a tab
    */
   setupProviderEngine({ origin, subjectType, sender, tabId }) {
+    console.log(' ');
+
+    console.log(' ');
     // setup json rpc engine stack
     const engine = new JsonRpcEngine();
     const { blockTracker, provider } = this;
@@ -3378,6 +3696,8 @@ export default class MetamaskController extends EventEmitter {
 
     // append tabId to each request if it exists
     if (tabId) {
+      console.log(' ');
+
       engine.push(createTabIdMiddleware({ tabId }));
     }
 
@@ -3398,6 +3718,8 @@ export default class MetamaskController extends EventEmitter {
 
     // onboarding
     if (subjectType === SUBJECT_TYPES.WEBSITE) {
+      console.log(' ');
+
       engine.push(
         createOnboardingMiddleware({
           location: sender.url,
@@ -3526,6 +3848,8 @@ export default class MetamaskController extends EventEmitter {
     engine.push(filterMiddleware);
     engine.push(subscriptionManager.middleware);
     if (subjectType !== SUBJECT_TYPES.INTERNAL) {
+      console.log(' ');
+
       // permissions
       engine.push(
         this.permissionController.createPermissionMiddleware({
@@ -3551,11 +3875,16 @@ export default class MetamaskController extends EventEmitter {
    * @param {*} outStream - The stream to provide public config over.
    */
   setupPublicConfig(outStream) {
+    console.log(' ');
+
+    console.log(' ');
     const configStream = storeAsStream(this.publicConfigStore);
 
     pump(configStream, outStream, (err) => {
       configStream.destroy();
       if (err) {
+        console.log(' ');
+
         log.error(err);
       }
     });
@@ -3572,11 +3901,18 @@ export default class MetamaskController extends EventEmitter {
    * @returns {string} The connection's id (so that it can be deleted later)
    */
   addConnection(origin, { engine }) {
+    console.log(' ');
+
+    console.log(' ');
     if (origin === 'metamask') {
+      console.log(' ');
+
       return null;
     }
 
     if (!this.connections[origin]) {
+      console.log(' ');
+
       this.connections[origin] = {};
     }
 
@@ -3596,14 +3932,21 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} id - The connection's id, as returned from addConnection.
    */
   removeConnection(origin, id) {
+    console.log(' ');
+
+    console.log(' ');
     const connections = this.connections[origin];
     if (!connections) {
+      console.log(' ');
+
       return;
     }
 
     delete connections[id];
 
     if (Object.keys(connections).length === 0) {
+      console.log(' ');
+
       delete this.connections[origin];
     }
   }
@@ -3616,8 +3959,13 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} origin - The origin string.
    */
   removeAllConnections(origin) {
+    console.log(' ');
+
+    console.log(' ');
     const connections = this.connections[origin];
     if (!connections) {
+      console.log(' ');
+
       return;
     }
 
@@ -3639,11 +3987,18 @@ export default class MetamaskController extends EventEmitter {
    * @param {unknown} payload - The event payload.
    */
   notifyConnections(origin, payload) {
+    console.log(' ');
+
+    console.log(' ');
     const connections = this.connections[origin];
 
     if (connections) {
+      console.log(' ');
+
       Object.values(connections).forEach((conn) => {
         if (conn.engine) {
+          console.log(' ');
+
           conn.engine.emit('notification', payload);
         }
       });
@@ -3664,6 +4019,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {unknown} payload - The event payload, or payload getter function.
    */
   notifyAllConnections(payload) {
+    console.log(' ');
+
+    console.log(' ');
     const getPayload =
       typeof payload === 'function'
         ? (origin) => payload(origin)
@@ -3672,6 +4030,8 @@ export default class MetamaskController extends EventEmitter {
     Object.keys(this.connections).forEach((origin) => {
       Object.values(this.connections[origin]).forEach(async (conn) => {
         if (conn.engine) {
+          console.log(' ');
+
           conn.engine.emit('notification', await getPayload(origin));
         }
       });
@@ -3688,6 +4048,10 @@ export default class MetamaskController extends EventEmitter {
    * @private
    */
   async _onKeyringControllerUpdate(state) {
+    console.log(' ');
+
+    console.log('_onKeyringControllerUpdate');
+
     const { keyrings } = state;
     const addresses = keyrings.reduce(
       (acc, { accounts }) => acc.concat(accounts),
@@ -3695,6 +4059,8 @@ export default class MetamaskController extends EventEmitter {
     );
 
     if (!addresses.length) {
+      console.log(' ');
+
       return;
     }
 
@@ -3752,6 +4118,8 @@ export default class MetamaskController extends EventEmitter {
    * @param newState
    */
   _onStateUpdate(newState) {
+    console.log(' ');
+
     this.isClientOpenAndUnlocked = newState.isUnlocked && this._isClientOpen;
     this.notifyAllConnections({
       method: NOTIFICATION_NAMES.chainChanged,
@@ -3782,6 +4150,8 @@ export default class MetamaskController extends EventEmitter {
   //=============================================================================
 
   getExternalPendingTransactions(address) {
+    console.log(' ');
+
     return this.smartTransactionsController.getTransactions({
       addressFrom: address,
       status: 'pending',
@@ -3795,6 +4165,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<number>}
    */
   async getPendingNonce(address) {
+    console.log(' ');
+
+    console.log('getPendingNonce');
+
     const {
       nonceDetails,
       releaseLock,
@@ -3812,6 +4186,10 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Promise<number>}
    */
   async getNextNonce(address) {
+    console.log(' ');
+
+    console.log('getNextNonce');
+
     const nonceLock = await this.txController.nonceTracker.getNonceLock(
       address,
     );
@@ -3836,13 +4214,21 @@ export default class MetamaskController extends EventEmitter {
    * @param {boolean} [duplicate] - Whether to duplicate the addresses on both chainIds (default: false)
    */
   async migrateAddressBookState(oldChainId, newChainId, duplicate = false) {
+    console.log(' ');
+
+    console.log('migrateAddressBookState');
+
     const { addressBook } = this.addressBookController.state;
 
     if (!addressBook[oldChainId]) {
+      console.log(' ');
+
       return;
     }
 
     for (const address of Object.keys(addressBook[oldChainId])) {
+      console.log(' ');
+
       const entry = addressBook[oldChainId][address];
       this.addressBookController.set(
         address,
@@ -3851,6 +4237,8 @@ export default class MetamaskController extends EventEmitter {
         entry.memo,
       );
       if (!duplicate) {
+        console.log(' ');
+
         this.addressBookController.delete(oldChainId, address);
       }
     }
@@ -3920,6 +4308,8 @@ export default class MetamaskController extends EventEmitter {
     );
 
     if (rpcSettings) {
+      console.log(' ');
+
       this.networkController.setRpcTarget(
         rpcSettings.rpcUrl,
         rpcSettings.chainId,
@@ -3952,6 +4342,10 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} rpcUrl - A RPC URL to delete.
    */
   async delCustomRpc(rpcUrl) {
+    console.log(' ');
+
+    console.log('delCustomRpc');
+
     await this.preferencesController.removeFromFrequentRpcList(rpcUrl);
   }
 
@@ -3963,10 +4357,18 @@ export default class MetamaskController extends EventEmitter {
    * @returns {Object} rpcInfo found in the frequentRpcList
    */
   findCustomRpcBy(rpcInfo) {
+    console.log(' ');
+
     const frequentRpcListDetail = this.preferencesController.getFrequentRpcListDetail();
     for (const existingRpcInfo of frequentRpcListDetail) {
+      console.log(' ');
+
       for (const key of Object.keys(rpcInfo)) {
+        console.log(' ');
+
         if (existingRpcInfo[key] === rpcInfo[key]) {
+          console.log(' ');
+
           return existingRpcInfo;
         }
       }
@@ -3975,6 +4377,8 @@ export default class MetamaskController extends EventEmitter {
   }
 
   async initializeThreeBox() {
+    console.log('initializeThreeBox');
+
     await this.threeBoxController.init();
   }
 
@@ -3984,6 +4388,10 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} transportType - The Ledger transport type.
    */
   async setLedgerTransportPreference(transportType) {
+    console.log(' ');
+
+    console.log('setLedgerTransportPreference');
+
     const currentValue = this.preferencesController.getLedgerTransportPreference();
     const newValue = this.preferencesController.setLedgerTransportPreference(
       transportType,
@@ -3991,6 +4399,8 @@ export default class MetamaskController extends EventEmitter {
 
     const keyring = await this.getKeyringForDevice(DEVICE_NAMES.LEDGER);
     if (keyring?.updateTransportMethod) {
+      console.log(' ');
+
       return keyring.updateTransportMethod(newValue).catch((e) => {
         // If there was an error updating the transport, we should
         // fall back to the original value
@@ -4009,7 +4419,11 @@ export default class MetamaskController extends EventEmitter {
    * @private
    */
   recordFirstTimeInfo(initState) {
+    console.log(' ');
+
     if (!('firstTimeInfo' in initState)) {
+      console.log(' ');
+
       const version = this.platform.getVersion();
       initState.firstTimeInfo = {
         version,
@@ -4026,6 +4440,8 @@ export default class MetamaskController extends EventEmitter {
    * @param {boolean} open
    */
   set isClientOpen(open) {
+    console.log(' ');
+
     this._isClientOpen = open;
     this.detectTokensController.isOpen = open;
   }
@@ -4040,6 +4456,8 @@ export default class MetamaskController extends EventEmitter {
       this.gasFeeController.stopPolling();
       this.appStateController.clearPollingTokens();
     } catch (error) {
+      console.log(' ');
+
       console.error(error);
     }
   }
@@ -4051,6 +4469,9 @@ export default class MetamaskController extends EventEmitter {
    * @param environmentType
    */
   onEnvironmentTypeClosed(environmentType) {
+    console.log(' ');
+
+    console.log(' ');
     const appStatePollingTokenType =
       POLLING_TOKEN_ENVIRONMENT_TYPES[environmentType];
     const pollingTokensToDisconnect = this.appStateController.store.getState()[
@@ -4071,6 +4492,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} hostname - the domain to safelist
    */
   safelistPhishingDomain(hostname) {
+    console.log(' ');
+
+    console.log(' ');
     return this.phishingController.bypass(hostname);
   }
 
@@ -4078,10 +4502,13 @@ export default class MetamaskController extends EventEmitter {
    * Locks MetaMask
    */
   setLocked() {
+    console.log(' ');
     const [trezorKeyring] = this.keyringController.getKeyringsByType(
       KEYRING_TYPES.TREZOR,
     );
     if (trezorKeyring) {
+      console.log(' ');
+
       trezorKeyring.dispose();
     }
     return this.keyringController.setLocked();
@@ -4099,6 +4526,9 @@ export default class MetamaskController extends EventEmitter {
    * @param {{ id: string, permissionName: string }} snap - The wrapper object of the snap to remove.
    */
   removeSnap(snap) {
+    console.log(' ');
+
+    console.log(' ');
     this.snapController.removeSnap(snap.id);
     this.permissionController.revokePermissionForAllSubjects(
       snap.permissionName,

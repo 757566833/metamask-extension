@@ -23,13 +23,19 @@ export const CaveatMutatorFactories = {
  * account permissions.
  */
 function removeAccount(targetAccount, existingAccounts) {
+  console.log(' ');
+
   const newAccounts = existingAccounts.filter(
     (address) => address !== targetAccount,
   );
 
   if (newAccounts.length === existingAccounts.length) {
+    console.log(' ');
+
     return { operation: CaveatMutatorOperation.noop };
   } else if (newAccounts.length > 0) {
+    console.log(' ');
+
     return {
       operation: CaveatMutatorOperation.updateValue,
       value: newAccounts,

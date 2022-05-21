@@ -17,6 +17,10 @@ const version = 48;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -29,6 +33,8 @@ const hexRegEx = /^0x[0-9a-f]+$/iu;
 const chainIdRegEx = /^0x[1-9a-f]+[0-9a-f]*$/iu;
 
 function transformState(state = {}) {
+  console.log(' ');
+
   // 1. Delete NetworkController.settings
   delete state.NetworkController?.settings;
 
@@ -39,6 +45,8 @@ function transformState(state = {}) {
     (typeof provider.chainId !== 'string' ||
       !chainIdRegEx.test(provider.chainId));
   if (isCustomRpcWithInvalidChainId || provider.type === 'localhost') {
+    console.log(' ');
+
     state.NetworkController.provider = {
       type: 'rinkeby',
       rpcUrl: '',
@@ -48,7 +56,11 @@ function transformState(state = {}) {
       ticker: 'ETH',
     };
   } else if (state.NetworkController?.provider) {
+    console.log(' ');
+
     if ('rpcTarget' in state.NetworkController.provider) {
+      console.log(' ');
+
       const rpcUrl = state.NetworkController.provider.rpcTarget;
       state.NetworkController.provider.rpcUrl = rpcUrl;
     }
@@ -57,9 +69,13 @@ function transformState(state = {}) {
 
   // 3.  Add localhost network to frequentRpcListDetail.
   if (!state.PreferencesController) {
+    console.log(' ');
+
     state.PreferencesController = {};
   }
   if (!state.PreferencesController.frequentRpcListDetail) {
+    console.log(' ');
+
     state.PreferencesController.frequentRpcListDetail = [];
   }
   state.PreferencesController.frequentRpcListDetail.unshift({
@@ -76,6 +92,8 @@ function transformState(state = {}) {
   // 5.  Convert transactions metamaskNetworkId to decimal if they are hex
   const transactions = state.TransactionController?.transactions;
   if (Array.isArray(transactions)) {
+    console.log(' ');
+
     transactions.forEach((transaction) => {
       const metamaskNetworkId = transaction?.metamaskNetworkId;
       if (
@@ -94,10 +112,14 @@ function transformState(state = {}) {
   const addressBook = state.AddressBookController?.addressBook || {};
   Object.keys(addressBook).forEach((networkKey) => {
     if (/^\d+$/iu.test(networkKey)) {
+      console.log(' ');
+
       const chainId = `0x${parseInt(networkKey, 10).toString(16)}`;
       updateChainIds(addressBook[networkKey], chainId);
 
       if (addressBook[chainId]) {
+        console.log(' ');
+
         mergeAddressBookKeys(addressBook, networkKey, chainId);
       } else {
         addressBook[chainId] = addressBook[networkKey];
@@ -113,13 +135,19 @@ function transformState(state = {}) {
   // 8.  Merge 'localhost' tokens into 'rpc' tokens
   const accountTokens = state.PreferencesController?.accountTokens;
   if (accountTokens) {
+    console.log(' ');
+
     Object.keys(accountTokens).forEach((account) => {
       const localhostTokens = accountTokens[account]?.localhost || [];
 
       if (localhostTokens.length > 0) {
+        console.log(' ');
+
         const rpcTokens = accountTokens[account].rpc || [];
 
         if (rpcTokens.length > 0) {
+          console.log(' ');
+
           accountTokens[account].rpc = mergeTokenArrays(
             localhostTokens,
             rpcTokens,
@@ -143,6 +171,8 @@ function transformState(state = {}) {
  * @param chainIdKey
  */
 function mergeAddressBookKeys(addressBook, networkKey, chainIdKey) {
+  console.log(' ');
+
   const networkKeyEntries = addressBook[networkKey] || {};
   // For the new entries, start by copying the existing entries for the chainId
   const newEntries = { ...addressBook[chainIdKey] };
@@ -150,6 +180,8 @@ function mergeAddressBookKeys(addressBook, networkKey, chainIdKey) {
   // For each address of the old/networkId key entries
   Object.keys(networkKeyEntries).forEach((address) => {
     if (newEntries[address] && typeof newEntries[address] === 'object') {
+      console.log(' ');
+
       const mergedEntry = {};
 
       // Collect all keys from both entries and merge the corresponding chainId
@@ -185,8 +217,12 @@ function mergeAddressBookKeys(addressBook, networkKey, chainIdKey) {
  * @param chainId
  */
 function updateChainIds(networkEntries, chainId) {
+  console.log(' ');
+
   Object.values(networkEntries).forEach((entry) => {
     if (entry && typeof entry === 'object') {
+      console.log(' ');
+
       entry.chainId = chainId;
     }
   });
@@ -201,6 +237,8 @@ function updateChainIds(networkEntries, chainId) {
  * @returns {Array<Object>}
  */
 function mergeTokenArrays(localhostTokens, rpcTokens) {
+  console.log(' ');
+
   const localhostTokensMap = tokenArrayToMap(localhostTokens);
   const rpcTokensMap = tokenArrayToMap(rpcTokens);
 
@@ -218,8 +256,12 @@ function mergeTokenArrays(localhostTokens, rpcTokens) {
   return mergedTokens;
 
   function tokenArrayToMap(array) {
+    console.log(' ');
+
     return array.reduce((map, token) => {
       if (token?.address && typeof token?.address === 'string') {
+        console.log(' ');
+
         map[token.address] = token;
       }
       return map;

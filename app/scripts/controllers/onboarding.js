@@ -23,6 +23,8 @@ export default class OnboardingController {
    * @param {OnboardingOptions} [opts] - Controller configuration parameters
    */
   constructor(opts = {}) {
+    console.log(' ');
+
     const initialTransientState = {
       onboardingTabs: {},
     };
@@ -37,6 +39,8 @@ export default class OnboardingController {
   }
 
   setSeedPhraseBackedUp(newSeedPhraseBackUpState) {
+    console.log(' ');
+
     this.store.updateState({
       seedPhraseBackedUp: newSeedPhraseBackUpState,
     });
@@ -59,6 +63,8 @@ export default class OnboardingController {
    * @param {string} type - Indicates the type of first time flow - create or import - the user wishes to follow
    */
   setFirstTimeFlowType(type) {
+    console.log(' ');
+
     this.store.updateState({ firstTimeFlowType: type });
   }
 
@@ -70,11 +76,15 @@ export default class OnboardingController {
    */
   registerOnboarding = async (location, tabId) => {
     if (this.store.getState().completedOnboarding) {
+      console.log(' ');
+
       log.debug('Ignoring registerOnboarding; user already onboarded');
       return;
     }
     const onboardingTabs = { ...this.store.getState().onboardingTabs };
     if (!onboardingTabs[location] || onboardingTabs[location] !== tabId) {
+      console.log(' ');
+
       log.debug(
         `Registering onboarding tab at location '${location}' with tabId '${tabId}'`,
       );

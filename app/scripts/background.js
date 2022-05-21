@@ -64,6 +64,8 @@ const localStore = inTest ? new ReadOnlyNetworkStore() : new LocalStore();
 let versionedData;
 
 if (inTest || process.env.METAMASK_DEBUG) {
+  console.log(' ');
+
   global.metamaskGetState = localStore.get.bind(localStore);
 }
 
@@ -131,6 +133,8 @@ initialize().catch(log.error);
  * @returns {Promise} Setup complete.
  */
 async function initialize() {
+  console.log('function initialize');
+
   console.log('initialize');
 
   const initState = await loadStateFromPersistence();
@@ -150,6 +154,8 @@ async function initialize() {
  * @returns {Promise<MetaMaskState>} Last data emitted from previous instance of MetaMask.
  */
 async function loadStateFromPersistence() {
+  console.log('function loadStateFromPersistence');
+
   console.log('loadStateFromPersistence');
 
   // migrations
@@ -166,6 +172,8 @@ async function loadStateFromPersistence() {
   // for a small number of users
   // https://github.com/metamask/metamask-extension/issues/3919
   if (versionedData && !versionedData.data) {
+    console.log(' ');
+
     // unable to recover, clear state
     versionedData = migrator.generateInitialState(firstTimeState);
     sentry.captureMessage('MetaMask - Empty vault found - unable to recover');
@@ -184,11 +192,15 @@ async function loadStateFromPersistence() {
   // migrate data
   versionedData = await migrator.migrateData(versionedData);
   if (!versionedData) {
+    console.log(' ');
+
     throw new Error('MetaMask - migrator returned undefined');
   }
 
   // write to disk
   if (localStore.isSupported) {
+    console.log(' ');
+
     localStore.set(versionedData);
   } else {
     // throw in setTimeout so as to not block boot
@@ -212,6 +224,9 @@ async function loadStateFromPersistence() {
  * @returns {Promise} After setup is complete.
  */
 function setupController(initState, initLangCode) {
+  console.log(' ');
+
+  console.log('setupController', initState, initLangCode);
   //
   // MetaMask Controller
   //
@@ -265,6 +280,9 @@ function setupController(initState, initLangCode) {
    * @returns {VersionedData} The state object wrapped in an object that includes a metadata key.
    */
   function versionifyData(state) {
+    console.log(' ');
+
+    console.log('versionifyData', state);
     versionedData.data = state;
     return versionedData;
   }
@@ -272,23 +290,39 @@ function setupController(initState, initLangCode) {
   let dataPersistenceFailing = false;
 
   async function persistData(state) {
+    console.log(' ');
+
+    console.log('function persistData');
+
     console.log('persistData');
 
     if (!state) {
+      console.log(' ');
+
       throw new Error('MetaMask - updated state is missing');
     }
     if (!state.data) {
+      console.log(' ');
+
       throw new Error('MetaMask - updated state does not have data');
     }
     if (localStore.isSupported) {
+      console.log(' ');
+
       try {
         await localStore.set(state);
         if (dataPersistenceFailing) {
+          console.log(' ');
+
           dataPersistenceFailing = false;
         }
       } catch (err) {
+        console.log(' ');
+
         // log error so we dont break the pipeline
         if (!dataPersistenceFailing) {
+          console.log(' ');
+
           dataPersistenceFailing = true;
           captureException(err);
         }
@@ -322,6 +356,8 @@ function setupController(initState, initLangCode) {
   const onCloseEnvironmentInstances = (isClientOpen, environmentType) => {
     // if all instances of metamask are closed we call a method on the controller to stop gasFeeController polling
     if (isClientOpen === false) {
+      console.log(' ');
+
       controller.onClientClosed();
       // otherwise we want to only remove the polling tokens for the environment type that has closed
     } else {
@@ -352,9 +388,14 @@ function setupController(initState, initLangCode) {
    * @param {Port} remotePort - The port provided by a new context.
    */
   function connectRemote(remotePort) {
+    console.log(' ');
+
+    console.log('connectRemote', remotePort);
     const processName = remotePort.name;
 
     if (metamaskBlockedPorts.includes(remotePort.name)) {
+      console.log(' ');
+
       return;
     }
 
@@ -362,6 +403,8 @@ function setupController(initState, initLangCode) {
     const sourcePlatform = getPlatform();
 
     if (sourcePlatform === PLATFORM_FIREFOX) {
+      console.log(' ');
+
       isMetaMaskInternalProcess = metamaskInternalProcessHash[processName];
     } else {
       isMetaMaskInternalProcess =
@@ -369,12 +412,16 @@ function setupController(initState, initLangCode) {
     }
 
     if (isMetaMaskInternalProcess) {
+      console.log(' ');
+
       const portStream = new PortStream(remotePort);
       // communication with popup
       controller.isClientOpen = true;
       controller.setupTrustedCommunication(portStream, remotePort.sender);
 
       if (processName === ENVIRONMENT_TYPE_POPUP) {
+        console.log(' ');
+
         popupIsOpen = true;
         endOfStream(portStream, () => {
           popupIsOpen = false;
@@ -385,6 +432,8 @@ function setupController(initState, initLangCode) {
       }
 
       if (processName === ENVIRONMENT_TYPE_NOTIFICATION) {
+        console.log(' ');
+
         notificationIsOpen = true;
 
         endOfStream(portStream, () => {
@@ -399,6 +448,8 @@ function setupController(initState, initLangCode) {
       }
 
       if (processName === ENVIRONMENT_TYPE_FULLSCREEN) {
+        console.log(' ');
+
         const tabId = remotePort.sender.tab.id;
         openMetamaskTabsIDs[tabId] = true;
 
@@ -414,12 +465,16 @@ function setupController(initState, initLangCode) {
       }
     } else {
       if (remotePort.sender && remotePort.sender.tab && remotePort.sender.url) {
+        console.log(' ');
+
         const tabId = remotePort.sender.tab.id;
         const url = new URL(remotePort.sender.url);
         const { origin } = url;
 
         remotePort.onMessage.addListener((msg) => {
           if (msg.data && msg.data.method === 'eth_requestAccounts') {
+            console.log(' ');
+
             requestAccountTabIds[origin] = tabId;
           }
         });
@@ -430,6 +485,9 @@ function setupController(initState, initLangCode) {
 
   // communication with page or other extension
   function connectExternal(remotePort) {
+    console.log(' ');
+
+    console.log('connectExternal');
     const portStream = new PortStream(remotePort);
     controller.setupUntrustedCommunication({
       connectionStream: portStream,
@@ -484,6 +542,8 @@ function setupController(initState, initLangCode) {
     let label = '';
     const count = getUnapprovedTransactionCount();
     if (count) {
+      console.log(' ');
+
       label = String(count);
     }
     browser.browserAction.setBadgeText({ text: label });
@@ -518,8 +578,12 @@ function setupController(initState, initLangCode) {
     NOTIFICATION_MANAGER_EVENTS.POPUP_CLOSED,
     ({ automaticallyClosed }) => {
       if (!automaticallyClosed) {
+        console.log(' ');
+
         rejectUnapprovedNotifications();
       } else if (getUnapprovedTransactionCount() > 0) {
+        console.log(' ');
+
         triggerUi();
       }
     },
@@ -591,6 +655,8 @@ function setupController(initState, initLangCode) {
  * Opens the browser popup for user confirmation
  */
 async function triggerUi() {
+  console.log('function triggerUi');
+
   console.log('triggerUi');
 
   const tabs = await platform.getActiveTabs();
@@ -622,12 +688,16 @@ async function triggerUi() {
  * then it waits until user interact with the UI
  */
 async function openPopup() {
+  console.log('function openPopup');
+
   console.log('openPopup');
 
   await triggerUi();
   await new Promise((resolve) => {
     const interval = setInterval(() => {
       if (!notificationIsOpen) {
+        console.log(' ');
+
         clearInterval(interval);
         resolve();
       }

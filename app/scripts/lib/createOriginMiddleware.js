@@ -5,6 +5,8 @@
  * @returns {Function}
  */
 export default function createOriginMiddleware(opts) {
+  console.log(' ');
+
   return function originMiddleware(
     /** @type {any} */ req,
     /** @type {any} */ _,

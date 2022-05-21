@@ -24,6 +24,8 @@ const normalizers = {
 };
 
 export function normalizeAndValidateTxParams(txParams, lowerCase = true) {
+  console.log(' ');
+
   const normalizedTxParams = normalizeTxParams(txParams, lowerCase);
   validateTxParams(normalizedTxParams);
   return normalizedTxParams;
@@ -38,10 +40,14 @@ export function normalizeAndValidateTxParams(txParams, lowerCase = true) {
  * @returns {Object} the normalized tx params
  */
 export function normalizeTxParams(txParams, lowerCase = true) {
+  console.log(' ');
+
   // apply only keys in the normalizers
   const normalizedTxParams = {};
   for (const key in normalizers) {
     if (txParams[key]) {
+      console.log(' ');
+
       normalizedTxParams[key] = normalizers[key](txParams[key], lowerCase);
     }
   }
@@ -64,6 +70,8 @@ function ensureMutuallyExclusiveFieldsNotProvided(
   mutuallyExclusiveField,
 ) {
   if (typeof txParams[mutuallyExclusiveField] !== 'undefined') {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams(
       `Invalid transaction params: specified ${fieldBeingValidated} but also included ${mutuallyExclusiveField}, these cannot be mixed`,
     );
@@ -79,7 +87,11 @@ function ensureMutuallyExclusiveFieldsNotProvided(
  * @throws {ethErrors.rpc.invalidParams} Throws if field is not a string
  */
 function ensureFieldIsString(txParams, field) {
+  console.log(' ');
+
   if (typeof txParams[field] !== 'string') {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams(
       `Invalid transaction params: ${field} is not a string. got: (${txParams[field]})`,
     );
@@ -98,6 +110,8 @@ function ensureFieldIsString(txParams, field) {
  *  expectations for provided field.
  */
 function ensureProperTransactionEnvelopeTypeProvided(txParams, field) {
+  console.log(' ');
+
   switch (field) {
     case 'maxFeePerGas':
     case 'maxPriorityFeePerGas':
@@ -131,17 +145,25 @@ function ensureProperTransactionEnvelopeTypeProvided(txParams, field) {
  * @throws {Error} if the tx params contains invalid fields
  */
 export function validateTxParams(txParams, eip1559Compatibility = true) {
+  console.log(' ');
+
   if (!txParams || typeof txParams !== 'object' || Array.isArray(txParams)) {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams(
       'Invalid transaction params: must be an object.',
     );
   }
   if (!txParams.to && !txParams.data) {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams(
       'Invalid transaction params: must specify "data" for contract deployments, or "to" (and optionally "data") for all other types of transactions.',
     );
   }
   if (isEIP1559Transaction({ txParams }) && !eip1559Compatibility) {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams(
       'Invalid transaction params: params specify an EIP-1559 transaction but the current network does not support EIP-1559',
     );
@@ -194,18 +216,24 @@ export function validateTxParams(txParams, eip1559Compatibility = true) {
       case 'value':
         ensureFieldIsString(txParams, 'value');
         if (value.toString().includes('-')) {
+          console.log(' ');
+
           throw ethErrors.rpc.invalidParams(
             `Invalid transaction value "${value}": not a positive number.`,
           );
         }
 
         if (value.toString().includes('.')) {
+          console.log(' ');
+
           throw ethErrors.rpc.invalidParams(
             `Invalid transaction value of "${value}": number must be in wei.`,
           );
         }
 
         if (!value.match(/^0x[a-fA-F0-9]+$/u)) {
+          console.log(' ');
+
           throw ethErrors.rpc.invalidParams(
             `Invalid transaction value of "${value}": not a valid hex string.`,
           );
@@ -213,6 +241,8 @@ export function validateTxParams(txParams, eip1559Compatibility = true) {
         break;
       case 'chainId':
         if (typeof value !== 'number' && typeof value !== 'string') {
+          console.log(' ');
+
           throw ethErrors.rpc.invalidParams(
             `Invalid transaction params: ${key} is not a Number or hex string. got: (${value})`,
           );
@@ -231,12 +261,18 @@ export function validateTxParams(txParams, eip1559Compatibility = true) {
  * @throws {Error} if the from address isn't valid
  */
 export function validateFrom(txParams) {
+  console.log(' ');
+
   if (!(typeof txParams.from === 'string')) {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams(
       `Invalid "from" address "${txParams.from}": not a string.`,
     );
   }
   if (!isValidHexAddress(txParams.from, { allowNonPrefixed: false })) {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams('Invalid "from" address.');
   }
 }
@@ -249,8 +285,14 @@ export function validateFrom(txParams) {
  * @throws {Error} if the recipient is invalid OR there isn't tx data
  */
 export function validateRecipient(txParams) {
+  console.log(' ');
+
   if (txParams.to === '0x' || txParams.to === null) {
+    console.log(' ');
+
     if (txParams.data) {
+      console.log(' ');
+
       delete txParams.to;
     } else {
       throw ethErrors.rpc.invalidParams('Invalid "to" address.');
@@ -270,31 +312,43 @@ export const validateConfirmedExternalTransaction = ({
   confirmedTransactions,
 } = {}) => {
   if (!txMeta || !txMeta.txParams) {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams(
       '"txMeta" or "txMeta.txParams" is missing',
     );
   }
   if (txMeta.status !== TRANSACTION_STATUSES.CONFIRMED) {
+    console.log(' ');
+
     throw ethErrors.rpc.invalidParams(
       'External transaction status should be "confirmed"',
     );
   }
   const externalTxNonce = txMeta.txParams.nonce;
   if (pendingTransactions && pendingTransactions.length > 0) {
+    console.log(' ');
+
     const foundPendingTxByNonce = pendingTransactions.find(
       (el) => el.txParams?.nonce === externalTxNonce,
     );
     if (foundPendingTxByNonce) {
+      console.log(' ');
+
       throw ethErrors.rpc.invalidParams(
         'External transaction nonce should not be in pending txs',
       );
     }
   }
   if (confirmedTransactions && confirmedTransactions.length > 0) {
+    console.log(' ');
+
     const foundConfirmedTxByNonce = confirmedTransactions.find(
       (el) => el.txParams?.nonce === externalTxNonce,
     );
     if (foundConfirmedTxByNonce) {
+      console.log(' ');
+
       throw ethErrors.rpc.invalidParams(
         'External transaction nonce should not be in confirmed txs',
       );
@@ -325,5 +379,7 @@ export function getFinalStates() {
  * @returns normalized gas used as hexadecimal string
  */
 export function normalizeTxReceiptGasUsed(gasUsed) {
+  console.log(' ');
+
   return typeof gasUsed === 'string' ? gasUsed : gasUsed.toString(16);
 }

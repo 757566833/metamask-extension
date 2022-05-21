@@ -28,6 +28,8 @@ const LEGACY_PROVIDER = 'provider';
 const LEGACY_PUBLIC_CONFIG = 'publicConfig';
 
 if (shouldInjectProvider()) {
+  console.log(' ');
+
   injectScript(inpageBundle);
   setupStreams();
 }
@@ -38,6 +40,9 @@ if (shouldInjectProvider()) {
  * @param {string} content - Code to be executed in the current document
  */
 function injectScript(content) {
+  console.log(' ');
+
+  console.log(' ');
   try {
     const container = document.head || document.documentElement;
     const scriptTag = document.createElement('script');
@@ -46,6 +51,8 @@ function injectScript(content) {
     container.insertBefore(scriptTag, container.children[0]);
     container.removeChild(scriptTag);
   } catch (error) {
+    console.log(' ');
+
     console.error('MetaMask: Provider injection failed.', error);
   }
 }
@@ -56,6 +63,8 @@ function injectScript(content) {
  *
  */
 async function setupStreams() {
+  console.log('function setupStreams');
+
   console.log('setupStreams');
 
   // the transport-specific streams for communication between inpage and background
@@ -129,6 +138,9 @@ async function setupStreams() {
 }
 
 function forwardTrafficBetweenMuxes(channelName, muxA, muxB) {
+  console.log(' ');
+
+  console.log(' ');
   const channelA = muxA.createStream(channelName);
   const channelB = muxB.createStream(channelName);
   pump(channelA, channelB, channelA, (error) =>
@@ -160,7 +172,11 @@ function forwardNamedTrafficBetweenMuxes(
 function getNotificationTransformStream() {
   return createThoughStream((chunk, _, cb) => {
     if (chunk?.name === PROVIDER) {
+      console.log(' ');
+
       if (chunk.data?.method === 'metamask_accountsChanged') {
+        console.log(' ');
+
         chunk.data.method = 'wallet_accountsChanged';
         chunk.data.result = chunk.data.params;
         delete chunk.data.params;
@@ -177,6 +193,9 @@ function getNotificationTransformStream() {
  * @param {Error} error - Stream connection error
  */
 function logStreamDisconnectWarning(remoteLabel, error) {
+  console.log(' ');
+
+  console.log(' ');
   console.debug(
     `MetaMask: Content script lost connection to "${remoteLabel}".`,
     error,
@@ -227,6 +246,8 @@ function shouldInjectProvider() {
 function doctypeCheck() {
   const { doctype } = window.document;
   if (doctype) {
+    console.log(' ');
+
     return doctype.name === 'html';
   }
   return true;
@@ -245,7 +266,11 @@ function suffixCheck() {
   const prohibitedTypes = [/\.xml$/u, /\.pdf$/u];
   const currentUrl = window.location.pathname;
   for (let i = 0; i < prohibitedTypes.length; i++) {
+    console.log(' ');
+
     if (prohibitedTypes[i].test(currentUrl)) {
+      console.log(' ');
+
       return false;
     }
   }
@@ -260,6 +285,8 @@ function suffixCheck() {
 function documentElementCheck() {
   const documentElement = document.documentElement.nodeName;
   if (documentElement) {
+    console.log(' ');
+
     return documentElement.toLowerCase() === 'html';
   }
   return true;
@@ -286,12 +313,16 @@ function blockedDomainCheck() {
   const currentUrl = window.location.href;
   let currentRegex;
   for (let i = 0; i < blockedDomains.length; i++) {
+    console.log(' ');
+
     const blockedDomain = blockedDomains[i].replace('.', '\\.');
     currentRegex = new RegExp(
       `(?:https?:\\/\\/)(?:(?!${blockedDomain}).)*$`,
       'u',
     );
     if (!currentRegex.test(currentUrl)) {
+      console.log(' ');
+
       return true;
     }
   }

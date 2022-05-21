@@ -24,6 +24,10 @@ const version = 52;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -33,7 +37,11 @@ export default {
 };
 
 function transformState(state = {}) {
+  console.log(' ');
+
   if (state.PreferencesController) {
+    console.log(' ');
+
     const {
       accountTokens,
       accountHiddenTokens,
@@ -44,15 +52,23 @@ function transformState(state = {}) {
     const newAccountHiddenTokens = {};
 
     if (accountTokens && Object.keys(accountTokens).length > 0) {
+      console.log(' ');
+
       for (const address of Object.keys(accountTokens)) {
+        console.log(' ');
+
         newAccountTokens[address] = {};
         if (accountTokens[address][NETWORK_TYPE_RPC]) {
+          console.log(' ');
+
           frequentRpcListDetail.forEach((detail) => {
             newAccountTokens[address][detail.chainId] =
               accountTokens[address][NETWORK_TYPE_RPC];
           });
         }
         for (const providerType of Object.keys(accountTokens[address])) {
+          console.log(' ');
+
           switch (providerType) {
             case MAINNET:
               newAccountTokens[address][MAINNET_CHAIN_ID] =
@@ -83,15 +99,23 @@ function transformState(state = {}) {
     }
 
     if (accountHiddenTokens && Object.keys(accountHiddenTokens).length > 0) {
+      console.log(' ');
+
       for (const address of Object.keys(accountHiddenTokens)) {
+        console.log(' ');
+
         newAccountHiddenTokens[address] = {};
         if (accountHiddenTokens[address][NETWORK_TYPE_RPC]) {
+          console.log(' ');
+
           frequentRpcListDetail.forEach((detail) => {
             newAccountHiddenTokens[address][detail.chainId] =
               accountHiddenTokens[address][NETWORK_TYPE_RPC];
           });
         }
         for (const providerType of Object.keys(accountHiddenTokens[address])) {
+          console.log(' ');
+
           switch (providerType) {
             case MAINNET:
               newAccountHiddenTokens[address][MAINNET_CHAIN_ID] =

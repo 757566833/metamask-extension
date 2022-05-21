@@ -9,6 +9,10 @@ const version = 57;
 export default {
   version,
   async migrate(originalVersionedData) {
+    console.log(' ');
+
+    console.log('migrate');
+
     const versionedData = cloneDeep(originalVersionedData);
     versionedData.meta.version = version;
     const state = versionedData.data;
@@ -18,6 +22,8 @@ export default {
 };
 
 function transformState(state) {
+  console.log(' ');
+
   if (
     state?.TransactionController?.transactions &&
     Array.isArray(state.TransactionController.transactions) &&
@@ -32,6 +38,8 @@ function transformState(state) {
       // generate a new one for the transaction.
       (tx) => {
         if (typeof tx.id === 'undefined' || tx.id === null) {
+          console.log(' ');
+
           // This mutates the item in the array, so will result in a change to
           // the state.
           tx.id = createId();
