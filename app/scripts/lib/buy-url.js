@@ -119,6 +119,8 @@ const createMoonPayUrl = async (walletAddress, chainId) => {
  * chainId does not match any of the specified cases, or if no chainId is given, returns undefined.
  */
 export default async function getBuyUrl({ chainId, address, service }) {
+  console.log('getBuyUrl');
+
   // default service by network if not specified
   if (!service) {
     // eslint-disable-next-line no-param-reassign

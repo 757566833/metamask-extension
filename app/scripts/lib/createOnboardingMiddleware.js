@@ -12,6 +12,8 @@ export default function createOnboardingMiddleware({
   registerOnboarding,
 }) {
   return async function originMiddleware(req, res, next, end) {
+    console.log('originMiddleware');
+
     try {
       if (req.method !== 'wallet_registerOnboarding') {
         next();

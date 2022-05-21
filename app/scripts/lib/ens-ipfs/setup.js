@@ -31,6 +31,8 @@ export default function setupEnsIpfsResolver({
   };
 
   async function webRequestDidFail(details) {
+    console.log('webRequestDidFail');
+
     const { tabId, url } = details;
     // ignore requests that are not associated with tabs
     // only attempt ENS resolution on mainnet
@@ -50,6 +52,8 @@ export default function setupEnsIpfsResolver({
   }
 
   async function attemptResolve({ tabId, name, pathname, search, fragment }) {
+    console.log('attemptResolve');
+
     const ipfsGateway = getIpfsGateway();
 
     browser.tabs.update(tabId, { url: `loading.html` });

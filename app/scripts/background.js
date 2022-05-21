@@ -131,6 +131,8 @@ initialize().catch(log.error);
  * @returns {Promise} Setup complete.
  */
 async function initialize() {
+  console.log('initialize');
+
   const initState = await loadStateFromPersistence();
   const initLangCode = await getFirstPreferredLangCode();
   await setupController(initState, initLangCode);
@@ -148,6 +150,8 @@ async function initialize() {
  * @returns {Promise<MetaMaskState>} Last data emitted from previous instance of MetaMask.
  */
 async function loadStateFromPersistence() {
+  console.log('loadStateFromPersistence');
+
   // migrations
   const migrator = new Migrator({ migrations });
   migrator.on('error', console.warn);
@@ -268,6 +272,8 @@ function setupController(initState, initLangCode) {
   let dataPersistenceFailing = false;
 
   async function persistData(state) {
+    console.log('persistData');
+
     if (!state) {
       throw new Error('MetaMask - updated state is missing');
     }
@@ -585,6 +591,8 @@ function setupController(initState, initLangCode) {
  * Opens the browser popup for user confirmation
  */
 async function triggerUi() {
+  console.log('triggerUi');
+
   const tabs = await platform.getActiveTabs();
   const currentlyActiveMetamaskTab = Boolean(
     tabs.find((tab) => openMetamaskTabsIDs[tab.id]),
@@ -614,6 +622,8 @@ async function triggerUi() {
  * then it waits until user interact with the UI
  */
 async function openPopup() {
+  console.log('openPopup');
+
   await triggerUi();
   await new Promise((resolve) => {
     const interval = setInterval(() => {

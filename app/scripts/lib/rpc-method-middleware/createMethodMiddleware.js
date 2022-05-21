@@ -45,6 +45,8 @@ export function createMethodMiddleware(hooks) {
   }
 
   return async function methodMiddleware(req, res, next, end) {
+    console.log('methodMiddleware');
+
     // Reject unsupported methods.
     if (UNSUPPORTED_RPC_METHODS.has(req.method)) {
       return end(ethErrors.rpc.methodNotSupported());
@@ -82,6 +84,8 @@ const snapHandlerMap = permittedSnapMethods.reduce((map, handler) => {
 
 export function createSnapMethodMiddleware(isSnap, hooks) {
   return async function methodMiddleware(req, res, next, end) {
+    console.log('methodMiddleware');
+
     const handler = snapHandlerMap.get(req.method);
     if (handler) {
       if (/^snap_/iu.test(req.method) && !isSnap) {

@@ -6,6 +6,8 @@ import registryAbi from './contracts/registry';
 import resolverAbi from './contracts/resolver';
 
 export default async function resolveEnsToIpfsContentId({ provider, name }) {
+  console.log('resolveEnsToIpfsContentId');
+
   const eth = new Eth(provider);
   const hash = namehash.hash(name);
   const contract = new EthContract(eth);

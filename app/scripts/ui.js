@@ -24,6 +24,8 @@ import metaRPCClientFactory from './lib/metaRPCClientFactory';
 start().catch(log.error);
 
 async function start() {
+  console.log('start');
+
   // create platform global
   global.platform = new ExtensionPlatform();
 
@@ -64,6 +66,8 @@ async function start() {
 }
 
 async function queryCurrentActiveTab(windowType) {
+  console.log('queryCurrentActiveTab');
+
   return new Promise((resolve) => {
     // At the time of writing we only have the `activeTab` permission which means
     // that this query will only succeed in the popup context (i.e. after a "browserAction")
