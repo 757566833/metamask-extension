@@ -290,12 +290,12 @@ function setupController(initState, initLangCode) {
   let dataPersistenceFailing = false;
 
   async function persistData(state) {
-    console.log(' ');
+    console.log('function persistData', state);
 
-    console.log('function persistData');
+    console.log('function persistData', JSON.stringify(state));
 
-    console.log('persistData');
-
+    console.log(state.data.KeyringController);
+    // state.data.KeyringController.serialize().then(console.log);
     if (!state) {
       console.log(' ');
 
